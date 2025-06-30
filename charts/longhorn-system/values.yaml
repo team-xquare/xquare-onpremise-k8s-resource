@@ -1,0 +1,8 @@
+longhorn:
+  defaultSettings:
+    defaultDataPath: /var/lib/longhorn
+    defaultDataLocality: best-effort
+    replicaAutoBalance: best-effort
+
+  preUpgradeChecker:
+    jobEnabled: false
