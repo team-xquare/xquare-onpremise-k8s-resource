@@ -6,7 +6,7 @@ metadata:
 spec:
   parentRefs:
     - name: internal-gateway
-      namespace: default
+      namespace: gateway
   hostnames:
     - longhorn-xquare-infra.dsmhs.kr.com
   rules:
