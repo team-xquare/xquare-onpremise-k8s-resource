@@ -15,6 +15,11 @@ cloudflare-tunnel:
 
   replicaCount: 3
 
+  image:
+    repository: cloudflare/cloudflared
+    pullPolicy: IfNotPresent
+    tag: "latest"
+
   resources:
     limits:
       cpu: 200m

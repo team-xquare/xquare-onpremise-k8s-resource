@@ -6,6 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace | default "default" }}
 spec:
   gatewayClassName: cilium
+  infrastructure:
+    annotations:
+      io.cilium/lb-ipam-ips: {{ .Values.external.ip }}
   listeners:
   - name: http
     port: 80
@@ -13,7 +16,4 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
-  addresses:
-  - type: IPAddress
-    value: {{ .Values.external.ip }}
 {{- end }}

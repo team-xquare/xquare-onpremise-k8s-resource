@@ -15,4 +15,5 @@ metadata:
   namespace: {{ .Release.Namespace | default "default" }}
 spec:
   blocks:
-    - cidr: {{ .Values.ippool.cidr }}
+    - start: {{ .Values.ippool.start | quote }}
+      stop: {{ .Values.ippool.stop | quote }}
