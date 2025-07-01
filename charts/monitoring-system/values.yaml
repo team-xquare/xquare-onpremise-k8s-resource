@@ -63,10 +63,10 @@ kube-prometheus-stack:
         datasources:
           - name: Prometheus
             type: prometheus
-            url: http://kube-prometheus-stack-prometheus.monitoring:9090
+            url: http://kube-prometheus-stack-prometheus.monitoring-system.svc.local:9090
             access: proxy
             isDefault: true
           - name: Alertmanager
             type: alertmanager
-            url: http://kube-prometheus-stack-alertmanager.monitoring:9093
+            url: http://kube-prometheus-stack-alertmanager.monitoring-system.svc.local:9093
             access: proxy
