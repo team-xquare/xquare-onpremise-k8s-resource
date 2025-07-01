@@ -1,22 +1,17 @@
 cloudflare-tunnel:
   cloudflare:
-    account: ""
-    tunnelName: ""
-    tunnelId: ""
-    secret: ""
     secretName: "cloudflare-tunnel-secret"
+
+    tunnelName: "onpremise-tunnel"
 
     enableWarp: true
 
     ingress:
       - hostname: "*.dsmhs.kr"
         service: https://192.168.0.200:443
-      - hostname: "*.dsmhs.kr"
-        service: http://192.168.0.200:80
+
       - hostname: "dsmhs.kr"
         service: https://192.168.0.200:443
-      - hostname: "dsmhs.kr"
-        service: http://192.168.0.200:80
 
       - service: http_status:404
 
@@ -29,3 +24,14 @@ cloudflare-tunnel:
     requests:
       cpu: 100m
       memory: 128Mi
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 65532
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
