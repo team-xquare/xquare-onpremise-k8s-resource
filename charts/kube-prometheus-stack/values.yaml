@@ -73,10 +73,10 @@ kube-prometheus-stack:
         datasources:
           - name: Prometheus
             type: prometheus
-            url: http://kube-prometheus-stack-kube-pro-prometheus:9090
+            url: kube-prometheus-stack-prometheus:9090
             access: proxy
             isDefault: true
           - name: Alertmanager
             type: alertmanager
-            url: http://kube-prometheus-stack-kube-pro-alertmanager:9093
+            url: http://kube-prometheus-stack-alertmanager:9093
             access: proxy
