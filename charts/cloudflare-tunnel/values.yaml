@@ -7,9 +7,6 @@ cloudflare-tunnel:
     enableWarp: true
 
     ingress:
-      - hostname: "*.dsmhs.kr"
-        service: https://192.168.0.200:443
-
       - hostname: "dsmhs.kr"
         service: https://192.168.0.200:443
 
