@@ -31,7 +31,6 @@ kube-prometheus-stack:
               requests:
                 storage: 20Gi
 
-
   alertmanager:
     enabled: true
     alertmanagerSpec:
@@ -46,7 +45,6 @@ kube-prometheus-stack:
               requests:
                 storage: 5Gi
 
-
   grafana:
     enabled: true
     resources:
@@ -56,7 +54,8 @@ kube-prometheus-stack:
     persistence:
       enabled: true
       size: 10Gi
-    grafana.ini:
+
+    ini:
       auth:
         disable_login_form: true
       auth.anonymous:
