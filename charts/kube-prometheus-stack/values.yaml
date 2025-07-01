@@ -16,6 +16,8 @@ kube-prometheus-stack:
     enabled: true
 
   prometheus:
+    ingress:
+      enabled: false
     enabled: true
     prometheusSpec:
       serviceMonitorSelector: {}
@@ -54,6 +56,9 @@ kube-prometheus-stack:
     persistence:
       enabled: true
       size: 10Gi
+
+    ingress:
+      enabled: false
 
     grafana.ini:
       auth:
