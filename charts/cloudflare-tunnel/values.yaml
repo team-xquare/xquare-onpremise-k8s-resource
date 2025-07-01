@@ -2,7 +2,7 @@ cloudflare-tunnel:
   cloudflare:
     secretName: "cloudflare-tunnel-secret"
 
-    tunnelName: "xquare-onpremise"
+    tunnelName: "dcf3545a-f80c-4925-be5f-3e2bc3fc3aa0"
 
     enableWarp: true
 
