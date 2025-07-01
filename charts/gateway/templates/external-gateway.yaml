@@ -10,15 +10,18 @@ spec:
   - name: http
     port: 80
     protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: All
   - name: https
     port: 443
     protocol: HTTPS
     tls:
       mode: Terminate
+    allowedRoutes:
+      namespaces:
+        from: All
   addresses:
   - type: IPAddress
     value: {{ .Values.external.ip }}
-  allowedRoutes:
-    namespaces:
-      from: All
 {{- end }}
