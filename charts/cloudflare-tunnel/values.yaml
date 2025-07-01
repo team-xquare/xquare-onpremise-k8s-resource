@@ -1,0 +1,31 @@
+cloudflare-tunnel:
+  cloudflare:
+    account: ""
+    tunnelName: ""
+    tunnelId: ""
+    secret: ""
+    secretName: "cloudflare-tunnel-secret"
+
+    enableWarp: true
+
+    ingress:
+      - hostname: "*.dsmhs.kr"
+        service: https://192.168.0.200:443
+      - hostname: "*.dsmhs.kr"
+        service: http://192.168.0.200:80
+      - hostname: "dsmhs.kr"
+        service: https://192.168.0.200:443
+      - hostname: "dsmhs.kr"
+        service: http://192.168.0.200:80
+
+      - service: http_status:404
+
+  replicaCount: 2
+
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
