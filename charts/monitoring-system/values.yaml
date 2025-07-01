@@ -1,0 +1,72 @@
+kube-prometheus-stack:
+  crds:
+    enabled: true
+
+  nodeExporter:
+    enabled: true
+
+  prometheusOperator:
+    enabled: true
+    resources:
+      requests:
+        cpu: 1m
+        memory: 16Mi
+
+  kubeStateMetrics:
+    enabled: true
+
+  prometheus:
+    enabled: true
+    prometheusSpec:
+      serviceMonitorSelector: {}
+      ruleSelector: {}
+      resources:
+        requests:
+          cpu: 350m
+          memory: 5Gi
+      storage:
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: 20Gi
+
+
+  alertmanager:
+    enabled: true
+    alertmanagerSpec:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+      storage:
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: 5Gi
+
+
+  grafana:
+    enabled: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 128Mi
+    persistence:
+      enabled: true
+      size: 10Gi
+
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Prometheus
+            type: prometheus
+            url: http://kube-prometheus-stack-prometheus.monitoring:9090
+            access: proxy
+            isDefault: true
+          - name: Alertmanager
+            type: alertmanager
+            url: http://kube-prometheus-stack-alertmanager.monitoring:9093
+            access: proxy
