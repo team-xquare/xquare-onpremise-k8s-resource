@@ -13,8 +13,6 @@ cloudflare-tunnel:
       - hostname: "dsmhs.kr"
         service: https://192.168.0.200:443
 
-      - service: http_status:404
-
   replicaCount: 2
 
   image:
