@@ -1,11 +1,11 @@
 external:
   enabled: true
   ip: "10.220.147.100"
-  
+
 internal:
   enabled: true
   ip: "10.220.147.101"
 
 ippool:
-  cidr: "10.220.147.0/24"
-  type: "l2"
+  start: "10.220.147.100"
+  stop: "10.220.147.101"
