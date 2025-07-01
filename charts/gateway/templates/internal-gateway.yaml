@@ -1,0 +1,24 @@
+{{- if .Values.internal.enabled }}
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: internal-gateway
+  namespace: {{ .Release.Namespace | default "default" }}
+spec:
+  gatewayClassName: cilium
+  listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+  - name: https
+    port: 443
+    protocol: HTTPS
+    tls:
+      mode: Terminate
+  addresses:
+  - type: IPAddress
+    value: {{ .Values.internal.ip }}
+  allowedRoutes:
+    namespaces:
+      from: All
+{{- end }}
