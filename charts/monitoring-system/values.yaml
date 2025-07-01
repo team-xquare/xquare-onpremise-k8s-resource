@@ -55,7 +55,7 @@ kube-prometheus-stack:
       enabled: true
       size: 10Gi
 
-    ini:
+    grafana.ini:
       auth:
         disable_login_form: true
       auth.anonymous:
