@@ -13,7 +13,7 @@ cloudflare-tunnel:
       - hostname: "dsmhs.kr"
         service: https://192.168.0.200:443
 
-  replicaCount: 2
+  replicaCount: 1
 
   resources:
     limits:
@@ -22,14 +22,3 @@ cloudflare-tunnel:
     requests:
       cpu: 100m
       memory: 128Mi
-
-  podSecurityContext:
-    runAsNonRoot: true
-    runAsUser: 65532
-
-  securityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - ALL
-    readOnlyRootFilesystem: true
