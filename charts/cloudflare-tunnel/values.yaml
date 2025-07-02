@@ -10,9 +10,6 @@ cloudflare-tunnel:
       - hostname: "*.dsmhs.kr"
         service: https://10.220.147.100:443
 
-      - hostname: "test.dsmhs.kr"
-        service: https://10.220.147.100:443
-
       - hostname: "dsmhs.kr"
         service: https://10.220.147.100:443
 
