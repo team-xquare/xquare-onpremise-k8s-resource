@@ -8,7 +8,7 @@ cloudflare-tunnel:
 
     ingress:
       - hostname: "*.dsmhs.kr"
-        service: https://10.220.147.100:443
+        service: http://10.220.147.100
 
       - hostname: "dsmhs.kr"
         service: https://10.220.147.100:443
