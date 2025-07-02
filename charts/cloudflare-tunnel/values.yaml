@@ -11,7 +11,7 @@ cloudflare-tunnel:
         service: http://argocd-server.argocd.svc.cluster.local:80
 
       - hostname: "tu.dsmhs.kr"
-        service: http://argocd-server.tu.svc.cluster.local:80
+        service: http://tu.tu.svc.cluster.local:80
 
       - hostname: "*.dsmhs.kr"
         service: https://10.220.147.100:443
