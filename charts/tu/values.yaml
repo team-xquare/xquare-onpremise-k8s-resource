@@ -39,9 +39,9 @@ affinity: {}
 
 ttyd:
   args:
-    - "-p"
+    - "--port"
     - "7681"
-    - "-i"
+    - "--interface"
     - "0.0.0.0"
-    - "-W"
+    - "--writable"
     - "bash"
