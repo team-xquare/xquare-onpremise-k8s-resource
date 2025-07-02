@@ -7,8 +7,11 @@ cloudflare-tunnel:
     enableWarp: true
 
     ingress:
-      - hostname: "*.dsmhs.kr"
+      - hostname: "argo.dsmhs.kr"
         service: http://harbor-core.harbor.svc.cluster.local:80
+
+      - hostname: "*.dsmhs.kr"
+        service: https://10.220.147.100:443
 
       - hostname: "dsmhs.kr"
         service: https://10.220.147.100:443
