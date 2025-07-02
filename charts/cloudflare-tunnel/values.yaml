@@ -8,7 +8,7 @@ cloudflare-tunnel:
 
     ingress:
       - hostname: "*.dsmhs.kr"
-        service: http://10.220.147.100
+        service: http://harbor-core.harbor.svc.cluster.local:80
 
       - hostname: "dsmhs.kr"
         service: https://10.220.147.100:443
