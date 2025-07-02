@@ -4,16 +4,23 @@ kind: Gateway
 metadata:
   name: external-gateway
   namespace: {{ .Release.Namespace | default "default" }}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
 spec:
   gatewayClassName: cilium
   infrastructure:
     annotations:
       io.cilium/lb-ipam-ips: {{ .Values.external.ip }}
   listeners:
-  - name: http
-    port: 80
-    protocol: HTTP
+  - name: https
+    port: 443
+    protocol: HTTPS
+    hostname: "*.dsmhs.kr"
     allowedRoutes:
       namespaces:
         from: All
+    tls:
+      mode: Terminate
+      certificateRefs:
+        - name: wildcard-dsmhs-tls
 {{- end }}

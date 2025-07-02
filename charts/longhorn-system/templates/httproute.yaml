@@ -7,8 +7,9 @@ spec:
   parentRefs:
     - name: internal-gateway
       namespace: gateway
+      sectionName: https
   hostnames:
-    - longhorn-xquare-infra.dsmhs.kr.com
+    - longhorn-xquare-infra.dsmhs.kr
   rules:
     - matches:
         - path:
