@@ -11,7 +11,7 @@ kube-prometheus-stack:
       requests:
         cpu: 1m
         memory: 16Mi
-      limit:
+      limits:
         cpu: 2m
         memory: 20Mi
 
@@ -29,7 +29,7 @@ kube-prometheus-stack:
         requests:
           cpu: 350m
           memory: 5Gi
-        limit:
+        limits:
           cpu: 400m
           memory: 7Gi
       storage:
@@ -59,7 +59,7 @@ kube-prometheus-stack:
       requests:
         cpu: 10m
         memory: 128Mi
-      limit:
+      limits:
         cpu: 15m
         memory: 256Mi
     persistence:
