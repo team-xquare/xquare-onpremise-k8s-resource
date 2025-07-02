@@ -22,11 +22,10 @@ spec:
             - name: http
               containerPort: 7681
               protocol: TCP
-          command: ["ttyd"]
+          command: ["/bin/sh"]
           args:
-            {{- range .Values.ttyd.args }}
-            - {{ . | quote }}
-            {{- end }}
+            - "-c"
+            - "apk add --no-cache openssh-client && exec ttyd {{- range .Values.ttyd.args }} {{ . | quote }}{{- end }}"
           livenessProbe:
             httpGet:
               path: /
