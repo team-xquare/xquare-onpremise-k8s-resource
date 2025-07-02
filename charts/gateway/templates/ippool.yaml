@@ -5,6 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace | default "default" }}
 spec:
   loadBalancerIPs: true
+  externalIPs: true
   interfaces:
     - "^eno[0-9]+"
 ---
