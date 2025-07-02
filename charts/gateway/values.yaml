@@ -1,11 +1,11 @@
 external:
   enabled: true
-  ip: "10.220.147.200"
+  ip: "10.220.147.100"
 
 internal:
   enabled: true
-  ip: "10.220.147.201"
+  ip: "10.220.147.101"
 
 ippool:
-  start: "10.220.147.199"
-  stop: "10.220.147.201"
+  start: "10.220.147.99"
+  stop: "10.220.147.101"
