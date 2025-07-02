@@ -10,8 +10,11 @@ cloudflare-tunnel:
       - hostname: "argo.dsmhs.kr"
         service: http://argocd-server.argocd.svc.cluster.local:80
 
+      - hostname: "tu.dsmhs.kr"
+        service: http://argocd-server.tu.svc.cluster.local:80
+
       - hostname: "*.dsmhs.kr"
-        service: https://cilium-gateway-internal-gateway.gateway.svc.cluster.local:443
+        service: https://10.220.147.100:443
 
       - hostname: "dsmhs.kr"
         service: https://10.220.147.100:443
