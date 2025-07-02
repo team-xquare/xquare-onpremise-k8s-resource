@@ -1,5 +1,5 @@
 external:
-  enabled: false
+  enabled: true
   ip: "10.220.147.100"
 
 internal:
