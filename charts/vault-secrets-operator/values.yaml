@@ -1,0 +1,8 @@
+vault-secrets-operator:
+  controller:
+    manager:
+      clientCache:
+        enabled: true
+  defaultVaultConnection:
+    enabled: true
+    address: "http://vault.vault.svc.cluster.local:8200"

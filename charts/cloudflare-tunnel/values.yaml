@@ -8,10 +8,10 @@ cloudflare-tunnel:
 
     ingress:
       - hostname: "*.dsmhs.kr"
-        service: https://192.168.0.200:443
+        service: https://10.220.147.100:443
 
       - hostname: "dsmhs.kr"
-        service: https://192.168.0.200:443
+        service: https://10.220.147.100:443
 
   replicaCount: 3
 

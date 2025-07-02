@@ -1,0 +1,20 @@
+harbor:
+  expose:
+    type: ClusterIP
+    tls:
+      enabled: false
+
+  externalURL: "https://harbor-xquare-infra.dsmhs.kr:443"
+
+  harborAdminPassword: "12345678"
+
+  registry:
+    relativeurls: true
+    upload_purging:
+      age: 12h
+      interval: 12h
+
+  persistence:
+    persistentVolumeClaim:
+      registry:
+        size: 150Gi

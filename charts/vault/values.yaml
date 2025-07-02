@@ -1,0 +1,6 @@
+vault:
+  server:
+    enabled: true
+
+  ui:
+    enabled: true
