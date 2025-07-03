@@ -17,7 +17,6 @@ spec:
             value: /api/
       backendRefs:
         - name: harbor-core
-          namespace: harbor
           port: 80
     - matches:
         - path:
@@ -25,7 +24,6 @@ spec:
             value: /service/
       backendRefs:
         - name: harbor-core
-          namespace: harbor
           port: 80
     - matches:
         - path:
@@ -33,7 +31,6 @@ spec:
             value: /v2/
       backendRefs:
         - name: harbor-core
-          namespace: harbor
           port: 80
     - matches:
         - path:
@@ -41,7 +38,6 @@ spec:
             value: /chartrepo/
       backendRefs:
         - name: harbor-core
-          namespace: harbor
           port: 80
     - matches:
         - path:
@@ -49,7 +45,6 @@ spec:
             value: /c/
       backendRefs:
         - name: harbor-core
-          namespace: harbor
           port: 80
     - matches:
         - path:
@@ -57,5 +52,4 @@ spec:
             value: /
       backendRefs:
         - name: harbor-portal
-          namespace: harbor
           port: 80
