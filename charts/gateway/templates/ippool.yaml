@@ -18,6 +18,6 @@ spec:
   blocks:
     - start: {{ .Values.ippool.start | quote }}
       stop: {{ .Values.ippool.stop | quote }}
-  namespaceSelector:
+  serviceSelector:
     matchLabels:
-      name: {{ .Release.Namespace | default "default" }}
+      "io.kubernetes.service.namespace": {{ .Release.Namespace | default "default" | quote }}
