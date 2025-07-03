@@ -1,0 +1,7 @@
+cloudflare-tunnel-remote:
+  replicaCount: 3
+
+  image:
+    repository: cloudflare/cloudflared
+    pullPolicy: IfNotPresent
+    tag: "latest"
