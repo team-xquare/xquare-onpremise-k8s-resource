@@ -85,6 +85,9 @@ kube-prometheus-stack:
           effect: "NoSchedule"
 
   grafana:
+    deploymentStrategy:
+      type: Recreate
+
     enabled: true
 
     resources:
