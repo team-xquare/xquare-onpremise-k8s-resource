@@ -83,7 +83,7 @@ kube-prometheus-stack:
         type: prometheus
         url: http://kube-prometheus-stack-prometheus:9090
         access: proxy
-        isDefault: true
+        isDefault: false
       - name: Alertmanager
         type: alertmanager
         url: http://kube-prometheus-stack-alertmanager:9093
