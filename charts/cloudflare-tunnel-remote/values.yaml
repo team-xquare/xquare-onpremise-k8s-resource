@@ -8,3 +8,13 @@ cloudflare-tunnel-remote:
     repository: cloudflare/cloudflared
     pullPolicy: IfNotPresent
     tag: "latest"
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: cloudflare-tunnel
+          topologyKey: kubernetes.io/hostname
