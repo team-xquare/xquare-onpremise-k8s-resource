@@ -11,10 +11,11 @@ cloudflare-tunnel-remote:
 
   affinity:
     podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchLabels:
-                app.kubernetes.io/name: cloudflare-tunnel
-            topologyKey: kubernetes.io/hostname
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - cloudflare-tunnel
+          topologyKey: kubernetes.io/hostname
