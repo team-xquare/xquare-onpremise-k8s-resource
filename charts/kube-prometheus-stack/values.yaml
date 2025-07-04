@@ -9,11 +9,11 @@ kube-prometheus-stack:
     enabled: true
     resources:
       requests:
-        cpu: 1m
-        memory: 16Mi
+        cpu: 200m
+        memory: 256Mi
       limits:
-        cpu: 2m
-        memory: 20Mi
+        cpu: 500m
+        memory: 512Mi
 
   kubeStateMetrics:
     enabled: true
