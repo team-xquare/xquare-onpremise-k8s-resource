@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - name: internal-gateway
       namespace: gateway
-      sectionName: https
+      sectionName: http
   hostnames:
     - argo-workflows-xquare-infra.dsmhs.kr
   rules:
