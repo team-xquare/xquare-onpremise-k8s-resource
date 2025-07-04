@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - name: internal-gateway
       namespace: gateway
-      sectionName: http
+      sectionName: https
   hostnames:
     - vault-xquare-infra.dsmhs.kr
   rules:
