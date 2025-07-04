@@ -4,6 +4,17 @@ kube-prometheus-stack:
 
   nodeExporter:
     enabled: true
+    tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
 
   prometheusOperator:
     enabled: true
@@ -14,9 +25,23 @@ kube-prometheus-stack:
       limits:
         cpu: 500m
         memory: 512Mi
+    tolerations:
+      - key: "role"
+        operator: "Equal"
+        value: "monitoring"
+        effect: "NoSchedule"
+    nodeSelector:
+      role: monitoring
 
   kubeStateMetrics:
     enabled: true
+    tolerations:
+      - key: "role"
+        operator: "Equal"
+        value: "monitoring"
+        effect: "NoSchedule"
+    nodeSelector:
+      role: monitoring
 
   prometheus:
     enabled: true
@@ -38,6 +63,13 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 20Gi
+      tolerations:
+        - key: "role"
+          operator: "Equal"
+          value: "monitoring"
+          effect: "NoSchedule"
+      nodeSelector:
+        role: monitoring
 
   alertmanager:
     enabled: true
@@ -52,6 +84,13 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 5Gi
+      tolerations:
+        - key: "role"
+          operator: "Equal"
+          value: "monitoring"
+          effect: "NoSchedule"
+      nodeSelector:
+        role: monitoring
 
   grafana:
     enabled: true
@@ -70,6 +109,15 @@ kube-prometheus-stack:
 
     ingress:
       enabled: false
+
+    tolerations:
+      - key: "role"
+        operator: "Equal"
+        value: "monitoring"
+        effect: "NoSchedule"
+
+    nodeSelector:
+      role: monitoring
 
     grafana.ini:
       auth:
