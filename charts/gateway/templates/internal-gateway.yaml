@@ -12,6 +12,13 @@ spec:
     annotations:
       io.cilium/lb-ipam-ips: {{ .Values.internal.ip }}
   listeners:
+  - name: http
+    port: 80
+    protocol: HTTP
+    hostname: "*.dsmhs.kr"
+    allowedRoutes:
+      namespaces:
+        from: All
   - name: https
     port: 443
     protocol: HTTPS
