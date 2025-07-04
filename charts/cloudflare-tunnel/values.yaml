@@ -11,7 +11,7 @@ cloudflare-tunnel:
         service: http://argocd-server.argocd.svc.cluster.local:80
 
       - hostname: "vault.dsmhs.kr"
-        service: http:vault-ui.vault.cluster.local:8200
+        service: http://vault-ui.vault.cluster.local:8200
 
       - hostname: "tu.dsmhs.kr"
         service: http://tu.tu.svc.cluster.local:7681
