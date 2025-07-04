@@ -1,4 +1,6 @@
 cloudflare-tunnel-remote:
+  cloudflare:
+    tunnel_token: ""
   replicaCount: 3
 
   image:
