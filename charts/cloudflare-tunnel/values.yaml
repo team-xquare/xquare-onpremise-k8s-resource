@@ -17,7 +17,7 @@ cloudflare-tunnel:
         service: http://tu.tu.svc.cluster.local:7681
 
       - hostname: "*.dsmhs.kr"
-        service: https://10.220.147.100:443
+        service: https://10.220.147.101:443
 
       - hostname: "dsmhs.kr"
         service: https://10.220.147.100:443
