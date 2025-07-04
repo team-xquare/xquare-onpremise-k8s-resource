@@ -30,8 +30,6 @@ kube-prometheus-stack:
         operator: "Equal"
         value: "monitoring"
         effect: "NoSchedule"
-    nodeSelector:
-      role: monitoring
 
   kubeStateMetrics:
     enabled: true
@@ -40,8 +38,6 @@ kube-prometheus-stack:
         operator: "Equal"
         value: "monitoring"
         effect: "NoSchedule"
-    nodeSelector:
-      role: monitoring
 
   prometheus:
     enabled: true
@@ -68,8 +64,6 @@ kube-prometheus-stack:
           operator: "Equal"
           value: "monitoring"
           effect: "NoSchedule"
-      nodeSelector:
-        role: monitoring
 
   alertmanager:
     enabled: true
@@ -89,8 +83,6 @@ kube-prometheus-stack:
           operator: "Equal"
           value: "monitoring"
           effect: "NoSchedule"
-      nodeSelector:
-        role: monitoring
 
   grafana:
     enabled: true
@@ -115,9 +107,6 @@ kube-prometheus-stack:
         operator: "Equal"
         value: "monitoring"
         effect: "NoSchedule"
-
-    nodeSelector:
-      role: monitoring
 
     grafana.ini:
       auth:
