@@ -4,6 +4,13 @@ kube-prometheus-stack:
 
   nodeExporter:
     enabled: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 30Mi
+      limits:
+        cpu: 50m
+        memory: 50Mi
     tolerations:
       - operator: Exists
         effect: NoSchedule
@@ -86,7 +93,6 @@ kube-prometheus-stack:
 
   grafana:
     enabled: true
-
     resources:
       requests:
         cpu: 50m
@@ -94,27 +100,22 @@ kube-prometheus-stack:
       limits:
         cpu: 200m
         memory: 512Mi
-
     persistence:
       enabled: true
       size: 10Gi
-
     ingress:
       enabled: false
-
     tolerations:
       - key: "role"
         operator: "Equal"
         value: "monitoring"
         effect: "NoSchedule"
-
     grafana.ini:
       auth:
         disable_login_form: true
       auth.anonymous:
         enabled: true
         org_role: Admin
-
     additionalDataSources:
       - name: Prometheus
         type: prometheus
@@ -126,3 +127,54 @@ kube-prometheus-stack:
         url: http://kube-prometheus-stack-alertmanager:9093
         access: proxy
         editable: false
+
+prometheus-smartctl-exporter:
+  enabled: true
+  resources:
+    requests:
+      cpu: 20m
+      memory: 40Mi
+    limits:
+      cpu: 100m
+      memory: 80Mi
+  tolerations:
+    - operator: Exists
+      effect: NoSchedule
+    - operator: Exists
+      effect: NoExecute
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+  serviceMonitor:
+    enabled: true
+  securityContext:
+    privileged: true
+
+prometheus-ipmi-exporter:
+  enabled: true
+  resources:
+    requests:
+      cpu: 10m
+      memory: 30Mi
+    limits:
+      cpu: 50m
+      memory: 50Mi
+  tolerations:
+    - operator: Exists
+      effect: NoSchedule
+    - operator: Exists
+      effect: NoExecute
+    - key: node-role.kubernetes.io/master
+      operator: Exists
+      effect: NoSchedule
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+  serviceMonitor:
+    enabled: true
+  securityContext:
+    privileged: true
+    hostNetwork: true
