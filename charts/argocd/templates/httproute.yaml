@@ -39,10 +39,10 @@ metadata:
   namespace: argocd
 spec:
   parentRefs:
-    - name: extrnal-gateway
+    - name: external-gateway
       namespace: gateway
       sectionName: http
-    - name: extrnal-gateway
+    - name: external-gateway
       namespace: gateway
       sectionName: https
   hostnames:
