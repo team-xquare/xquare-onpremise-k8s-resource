@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - name: internal-gateway
       namespace: gateway
-      sectionName: https
+      sectionName: http
   hostnames:
     - argocd-xquare-infra.dsmhs.kr
   rules:
@@ -36,7 +36,7 @@ metadata:
   namespace: argocd
 spec:
   parentRefs:
-    - name: internal-gateway
+    - name: extrnal-gateway
       namespace: gateway
       sectionName: http
   hostnames:
