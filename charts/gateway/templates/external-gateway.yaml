@@ -8,9 +8,9 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-issuer
 spec:
   gatewayClassName: cilium
-  infrastructure:
-    annotations:
-      # io.cilium/lb-ipam-ips: {{ .Values.external.ip }}
+  # infrastructure:
+  #   annotations:
+  #     io.cilium/lb-ipam-ips: {{ .Values.external.ip }}
   listeners:
   - name: http
     port: 80
