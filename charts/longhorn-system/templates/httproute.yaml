@@ -8,6 +8,9 @@ spec:
     - name: internal-gateway
       namespace: gateway
       sectionName: http
+    - name: internal-gateway
+      namespace: gateway
+      sectionName: https
   hostnames:
     - longhorn-xquare-infra.dsmhs.kr
   rules:

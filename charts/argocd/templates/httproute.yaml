@@ -8,6 +8,9 @@ spec:
     - name: internal-gateway
       namespace: gateway
       sectionName: http
+    - name: internal-gateway
+      namespace: gateway
+      sectionName: https
   hostnames:
     - argocd-xquare-infra.dsmhs.kr
   rules:
@@ -39,6 +42,9 @@ spec:
     - name: extrnal-gateway
       namespace: gateway
       sectionName: http
+    - name: extrnal-gateway
+      namespace: gateway
+      sectionName: https
   hostnames:
     - argocdwebhook-xquare-infra.dsmhs.kr
   rules:
