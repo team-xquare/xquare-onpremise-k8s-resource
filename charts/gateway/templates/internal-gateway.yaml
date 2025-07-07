@@ -10,7 +10,7 @@ spec:
   gatewayClassName: cilium
   infrastructure:
     annotations:
-      io.cilium/lb-ipam-ips: {{ .Values.internal.ip }}
+      # io.cilium/lb-ipam-ips: {{ .Values.internal.ip }}
   listeners:
   - name: http
     port: 80
