@@ -57,79 +57,278 @@ data:
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>404 - 페이지를 찾을 수 없습니다</title>
+        <title>404 - XQUARE Infrastructure</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <style>
-            body {
-                font-family: 'Noto Sans KR', sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            * {
                 margin: 0;
                 padding: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                color: white;
+                box-sizing: border-box;
             }
-            .container {
-                text-align: center;
-                max-width: 600px;
-                padding: 40px;
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(10px);
-                border-radius: 20px;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            }
-            .error-code {
-                font-size: 8rem;
-                font-weight: bold;
-                margin: 0;
-                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            }
-            .error-message {
-                font-size: 1.5rem;
-                margin: 20px 0;
-                opacity: 0.9;
-            }
-            .error-description {
-                font-size: 1rem;
-                margin: 20px 0;
-                opacity: 0.8;
+            
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: #0d1117;
+                color: #e6edf3;
+                overflow-x: hidden;
                 line-height: 1.6;
             }
-            .home-button {
-                display: inline-block;
-                padding: 12px 30px;
-                background: rgba(255, 255, 255, 0.2);
-                color: white;
-                text-decoration: none;
-                border-radius: 25px;
-                margin-top: 30px;
-                transition: all 0.3s ease;
-                border: 2px solid rgba(255, 255, 255, 0.3);
+            
+            .background {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                background: radial-gradient(circle at 25% 25%, rgba(120, 119, 198, 0.15) 0%, transparent 70%),
+                            radial-gradient(circle at 75% 75%, rgba(255, 118, 117, 0.15) 0%, transparent 70%);
             }
-            .home-button:hover {
-                background: rgba(255, 255, 255, 0.3);
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            
+            .container {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 2rem;
+                position: relative;
+                max-width: 1200px;
+                margin: 0 auto;
             }
+            
+            .header {
+                text-align: center;
+                margin-bottom: 4rem;
+            }
+            
             .logo {
+                font-size: 3rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, #7877C6 0%, #FF7675 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 1rem;
+                letter-spacing: -0.02em;
+            }
+            
+            .tagline {
                 font-size: 1.2rem;
-                font-weight: bold;
-                margin-bottom: 30px;
-                opacity: 0.7;
+                color: #7d8590;
+                font-weight: 400;
+                margin-bottom: 0.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+                color: #656d76;
+                font-weight: 300;
+            }
+            
+            .error-section {
+                text-align: center;
+                margin-bottom: 4rem;
+            }
+            
+            .error-code {
+                font-size: 10rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, #7877C6 0%, #FF7675 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin-bottom: 1.5rem;
+                line-height: 1;
+                letter-spacing: -0.02em;
+            }
+            
+            .error-message {
+                font-size: 2rem;
+                font-weight: 600;
+                color: #e6edf3;
+                margin-bottom: 1rem;
+            }
+            
+            .error-description {
+                font-size: 1.1rem;
+                color: #7d8590;
+                max-width: 600px;
+                margin: 0 auto 2.5rem;
+                line-height: 1.7;
+            }
+            
+            
+            .info-section {
+                margin-top: 5rem;
+                text-align: center;
+                max-width: 900px;
+                width: 100%;
+            }
+            
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 2rem;
+                margin-bottom: 3rem;
+            }
+            
+            .info-card {
+                background: rgba(33, 38, 45, 0.6);
+                border: 1px solid #30363d;
+                border-radius: 0.75rem;
+                padding: 2rem;
+                text-align: left;
+                backdrop-filter: blur(10px);
+                transition: all 0.3s ease;
+            }
+            
+            .info-card:hover {
+                border-color: #7d8590;
+                transform: translateY(-3px);
+                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            }
+            
+            .info-card h3 {
+                font-size: 1.2rem;
+                font-weight: 600;
+                color: #e6edf3;
+                margin-bottom: 1rem;
+            }
+            
+            .info-card p {
+                font-size: 0.95rem;
+                color: #7d8590;
+                line-height: 1.6;
+            }
+            
+            .vision-section {
+                background: rgba(33, 38, 45, 0.4);
+                border: 1px solid #30363d;
+                border-radius: 0.75rem;
+                padding: 2.5rem;
+                text-align: center;
+                backdrop-filter: blur(10px);
+                margin-top: 2rem;
+            }
+            
+            .vision-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #FF7675;
+                margin-bottom: 1.5rem;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+            }
+            
+            .vision-text {
+                font-size: 1.1rem;
+                color: #e6edf3;
+                font-weight: 500;
+                line-height: 1.7;
+            }
+            
+            .breadcrumb {
+                position: absolute;
+                top: 2rem;
+                left: 2rem;
+                font-size: 0.9rem;
+                color: #7d8590;
+            }
+            
+            
+            .status-code {
+                position: absolute;
+                top: 2rem;
+                right: 2rem;
+                background: rgba(255, 118, 117, 0.1);
+                border: 1px solid rgba(255, 118, 117, 0.2);
+                border-radius: 0.5rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+                color: #FF7675;
+                font-weight: 500;
+            }
+            
+            @media (max-width: 768px) {
+                .error-code {
+                    font-size: 7rem;
+                }
+                
+                .logo {
+                    font-size: 2.5rem;
+                }
+                
+                .error-message {
+                    font-size: 1.5rem;
+                }
+                
+                
+                .info-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                .breadcrumb,
+                .status-code {
+                    position: static;
+                    margin-bottom: 2rem;
+                }
             }
         </style>
     </head>
     <body>
+        <div class="background"></div>
+        
+        <div class="breadcrumb">
+            XQUARE Infrastructure / 404 Error
+        </div>
+        
+        <div class="status-code">
+            HTTP 404
+        </div>
+        
         <div class="container">
-            <div class="logo">DSMHS</div>
-            <h1 class="error-code">404</h1>
-            <div class="error-message">페이지를 찾을 수 없습니다</div>
-            <div class="error-description">
-                요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.<br>
-                URL을 다시 확인해 주세요.
+            <div class="header">
+                <div class="logo">XQUARE</div>
+                <div class="tagline">DSM을 위한 통합 인프라 서비스</div>
+                <div class="subtitle">Production-Ready Infrastructure Platform</div>
             </div>
-            <a href="/" class="home-button">홈으로 돌아가기</a>
+            
+            <div class="error-section">
+                <div class="error-code">404</div>
+                <div class="error-message">서비스를 찾을 수 없습니다</div>
+                <div class="error-description">
+                    요청하신 서비스가 아직 배포되지 않았거나 존재하지 않습니다.<br>
+                    서비스 배포 상태를 확인하고 다시 시도해주세요.
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>간편한 배포</h3>
+                        <p>복잡한 설정 없이 간단한 구성으로 서비스를 배포하고 관리할 수 있습니다. CI/CD 파이프라인과 완전히 통합되어 있습니다.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3>실시간 모니터링</h3>
+                        <p>Metrics, Logs, Traces를 통한 종합적인 애플리케이션 모니터링을 제공합니다. 성능 이슈를 사전에 감지하고 대응할 수 있습니다.</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3>스마트 알림</h3>
+                        <p>Tracing 기반의 지능형 알림 시스템으로 중요한 이벤트를 놓치지 않고 빠르게 대응할 수 있습니다.</p>
+                    </div>
+                </div>
+                
+                <div class="vision-section">
+                    <div class="vision-title">Vision</div>
+                    <div class="vision-text">
+                        모든 학생 개발자가 운영 환경 걱정 없이<br>
+                        서비스의 성장에만 집중할 수 있는 세상을 만듭니다.
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
     </html>
