@@ -173,14 +173,11 @@ data:
             }
             
             .vision-title {
-                font-size: 3rem;
-                font-weight: 800;
-                background: linear-gradient(135deg, #7877C6 0%, #FF7675 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                margin-bottom: 2rem;
-                letter-spacing: 0.2em;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #FF7675;
+                margin-bottom: 1.5rem;
+                letter-spacing: 0.1em;
                 text-transform: uppercase;
                 position: relative;
             }
@@ -227,18 +224,6 @@ data:
             }
             
             
-            .status-code {
-                position: absolute;
-                top: 2rem;
-                right: 2rem;
-                background: rgba(255, 118, 117, 0.1);
-                border: 1px solid rgba(255, 118, 117, 0.2);
-                border-radius: 0.5rem;
-                padding: 0.5rem 1rem;
-                font-size: 0.85rem;
-                color: #FF7675;
-                font-weight: 500;
-            }
             
             @media (max-width: 768px) {
                 .error-code {
@@ -255,15 +240,14 @@ data:
                 
                 
                 .vision-title {
-                    font-size: 2.5rem;
+                    font-size: 1.3rem;
                 }
                 
                 .vision-text {
                     font-size: 1.1rem;
                 }
                 
-                .breadcrumb,
-                .status-code {
+                .breadcrumb {
                     position: static;
                     margin-bottom: 2rem;
                 }
@@ -277,9 +261,6 @@ data:
             XQUARE Infrastructure / 404 Error
         </div>
         
-        <div class="status-code">
-            HTTP 404
-        </div>
         
         <div class="container">
             <div class="header">
