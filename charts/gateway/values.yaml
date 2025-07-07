@@ -9,3 +9,6 @@ internal:
 ippool:
   start: "10.220.147.100"
   stop: "10.220.147.101"
+
+custom404:
+  enabled: true
