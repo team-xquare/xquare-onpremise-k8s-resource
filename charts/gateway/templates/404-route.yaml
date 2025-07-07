@@ -12,8 +12,6 @@ spec:
   - name: internal-gateway
     namespace: {{ .Release.Namespace | default "default" }}
   {{- end }}
-  hostnames:
-  - "*.dsmhs.kr"
   rules:
   - matches:
     - path:
