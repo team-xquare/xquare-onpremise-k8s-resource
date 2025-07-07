@@ -159,62 +159,6 @@ data:
             }
             
             
-            .vision-section {
-                margin-top: 6rem;
-                text-align: center;
-                max-width: 800px;
-                width: 100%;
-                position: relative;
-            }
-            
-            .vision-content {
-                position: relative;
-                z-index: 2;
-            }
-            
-            .vision-title {
-                font-size: 1.5rem;
-                font-weight: 700;
-                color: #FF7675;
-                margin-bottom: 1.5rem;
-                letter-spacing: 0.1em;
-                text-transform: uppercase;
-                position: relative;
-            }
-            
-            .vision-text {
-                font-size: 1.3rem;
-                color: #e6edf3;
-                font-weight: 400;
-                line-height: 1.8;
-                opacity: 0.9;
-                max-width: 600px;
-                margin: 0 auto;
-            }
-            
-            .vision-decoration {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-top: 3rem;
-                opacity: 0.6;
-            }
-            
-            .decoration-line {
-                width: 80px;
-                height: 1px;
-                background: linear-gradient(90deg, transparent, #7877C6, transparent);
-            }
-            
-            .decoration-dot {
-                width: 8px;
-                height: 8px;
-                background: linear-gradient(135deg, #7877C6 0%, #FF7675 100%);
-                border-radius: 50%;
-                margin: 0 1rem;
-                box-shadow: 0 0 20px rgba(120, 119, 198, 0.5);
-            }
-            
             .breadcrumb {
                 position: absolute;
                 top: 2rem;
@@ -238,14 +182,6 @@ data:
                     font-size: 1.5rem;
                 }
                 
-                
-                .vision-title {
-                    font-size: 1.3rem;
-                }
-                
-                .vision-text {
-                    font-size: 1.1rem;
-                }
                 
                 .breadcrumb {
                     position: static;
@@ -278,20 +214,6 @@ data:
                 </div>
             </div>
             
-            <div class="vision-section">
-                <div class="vision-content">
-                    <div class="vision-title">VISION</div>
-                    <div class="vision-text">
-                        모든 학생 개발자가 운영 환경 걱정 없이<br>
-                        서비스의 성장에만 집중할 수 있는 세상을 만듭니다.
-                    </div>
-                </div>
-                <div class="vision-decoration">
-                    <div class="decoration-line"></div>
-                    <div class="decoration-dot"></div>
-                    <div class="decoration-line"></div>
-                </div>
-            </div>
         </div>
     </body>
     </html>
