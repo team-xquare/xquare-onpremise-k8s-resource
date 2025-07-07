@@ -1,4 +1,159 @@
 {{- if .Values.custom404.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-404-page
+  namespace: {{ .Release.Namespace | default "default" }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-404-page
+  template:
+    metadata:
+      labels:
+        app: custom-404-page
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: html-content
+          mountPath: /usr/share/nginx/html
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: html-content
+        configMap:
+          name: custom-404-html
+      - name: nginx-config
+        configMap:
+          name: custom-404-nginx-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: custom-404-service
+  namespace: {{ .Release.Namespace | default "default" }}
+spec:
+  selector:
+    app: custom-404-page
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-404-html
+  namespace: {{ .Release.Namespace | default "default" }}
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>404 - 페이지를 찾을 수 없습니다</title>
+        <style>
+            body {
+                font-family: 'Noto Sans KR', sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                color: white;
+            }
+            .container {
+                text-align: center;
+                max-width: 600px;
+                padding: 40px;
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            }
+            .error-code {
+                font-size: 8rem;
+                font-weight: bold;
+                margin: 0;
+                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            }
+            .error-message {
+                font-size: 1.5rem;
+                margin: 20px 0;
+                opacity: 0.9;
+            }
+            .error-description {
+                font-size: 1rem;
+                margin: 20px 0;
+                opacity: 0.8;
+                line-height: 1.6;
+            }
+            .home-button {
+                display: inline-block;
+                padding: 12px 30px;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                text-decoration: none;
+                border-radius: 25px;
+                margin-top: 30px;
+                transition: all 0.3s ease;
+                border: 2px solid rgba(255, 255, 255, 0.3);
+            }
+            .home-button:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            }
+            .logo {
+                font-size: 1.2rem;
+                font-weight: bold;
+                margin-bottom: 30px;
+                opacity: 0.7;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="logo">DSMHS</div>
+            <h1 class="error-code">404</h1>
+            <div class="error-message">페이지를 찾을 수 없습니다</div>
+            <div class="error-description">
+                요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.<br>
+                URL을 다시 확인해 주세요.
+            </div>
+            <a href="/" class="home-button">홈으로 돌아가기</a>
+        </div>
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-404-nginx-config
+  namespace: {{ .Release.Namespace | default "default" }}
+data:
+  default.conf: |
+    server {
+        listen 80;
+        server_name _;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        location / {
+            try_files $uri $uri/ /index.html;
+        }
+
+        error_page 404 /index.html;
+    }
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -17,110 +172,7 @@ spec:
     - path:
         type: PathPrefix
         value: "/"
-    filters:
-    - type: ResponseHeaderModifier
-      responseHeaderModifier:
-        set:
-        - name: Content-Type
-          value: text/html; charset=utf-8
-    - type: ExtensionRef
-      extensionRef:
-        group: gateway.envoyproxy.io
-        kind: HTTPRouteFilter
-        name: custom-404-filter
-{{- end }}
----
-{{- if .Values.custom404.enabled }}
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: HTTPRouteFilter
-metadata:
-  name: custom-404-filter
-  namespace: {{ .Release.Namespace | default "default" }}
-spec:
-  directResponse:
-    statusCode: 404
-    body:
-      type: Inline
-      inline: |
-        <!DOCTYPE html>
-        <html lang="ko">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>404 - 페이지를 찾을 수 없습니다</title>
-            <style>
-                body {
-                    font-family: 'Noto Sans KR', sans-serif;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    margin: 0;
-                    padding: 0;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    min-height: 100vh;
-                    color: white;
-                }
-                .container {
-                    text-align: center;
-                    max-width: 600px;
-                    padding: 40px;
-                    background: rgba(255, 255, 255, 0.1);
-                    backdrop-filter: blur(10px);
-                    border-radius: 20px;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-                }
-                .error-code {
-                    font-size: 8rem;
-                    font-weight: bold;
-                    margin: 0;
-                    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-                }
-                .error-message {
-                    font-size: 1.5rem;
-                    margin: 20px 0;
-                    opacity: 0.9;
-                }
-                .error-description {
-                    font-size: 1rem;
-                    margin: 20px 0;
-                    opacity: 0.8;
-                    line-height: 1.6;
-                }
-                .home-button {
-                    display: inline-block;
-                    padding: 12px 30px;
-                    background: rgba(255, 255, 255, 0.2);
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 25px;
-                    margin-top: 30px;
-                    transition: all 0.3s ease;
-                    border: 2px solid rgba(255, 255, 255, 0.3);
-                }
-                .home-button:hover {
-                    background: rgba(255, 255, 255, 0.3);
-                    transform: translateY(-2px);
-                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-                }
-                .logo {
-                    font-size: 1.2rem;
-                    font-weight: bold;
-                    margin-bottom: 30px;
-                    opacity: 0.7;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="logo">DSMHS</div>
-                <h1 class="error-code">404</h1>
-                <div class="error-message">페이지를 찾을 수 없습니다</div>
-                <div class="error-description">
-                    요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.<br>
-                    URL을 다시 확인해 주세요.
-                </div>
-                <a href="/" class="home-button">홈으로 돌아가기</a>
-            </div>
-        </body>
-        </html>
+    backendRefs:
+    - name: custom-404-service
+      port: 80
 {{- end }}
