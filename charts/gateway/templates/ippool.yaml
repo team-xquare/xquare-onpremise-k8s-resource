@@ -8,7 +8,7 @@ spec:
   externalIPs: true
   interfaces:
     - "^eno[0-9]+"
-  prefixLength: 24
+{{/*  prefixLength: 24*/}}
 ---
 apiVersion: "cilium.io/v2alpha1"
 kind: CiliumLoadBalancerIPPool
