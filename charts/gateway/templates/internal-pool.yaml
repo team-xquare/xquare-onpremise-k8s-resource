@@ -3,8 +3,5 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   name: internal-pool
 spec:
-  cidrs:
-    - cidr: "10.220.147.101/24"  # 전체 서브넷 지정
-  serviceSelector:
-    matchLabels:
-      io.cilium/lb-ipam-pool: internal-pool
+  blocks:
+    - cidr: "10.220.147.100/24"
