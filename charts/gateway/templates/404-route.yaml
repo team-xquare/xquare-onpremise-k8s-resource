@@ -55,188 +55,80 @@ data:
     <!DOCTYPE html>
     <html lang="ko">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>404 - XQUARE Infrastructure</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>404 - XQUARE</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
         <style>
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
             }
-            
-            body {
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: #0d1117;
-                color: #e6edf3;
-                overflow-x: hidden;
-                line-height: 1.6;
-            }
-            
-            .background {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
+            html, body {
                 height: 100%;
-                z-index: -1;
-                background: radial-gradient(circle at 25% 25%, rgba(120, 119, 198, 0.15) 0%, transparent 70%),
-                            radial-gradient(circle at 75% 75%, rgba(255, 118, 117, 0.15) 0%, transparent 70%);
+                background-color: #0d1117;
+                color: #e6edf3;
+                font-family: 'Inter', sans-serif;
             }
-            
-            .container {
-                min-height: 100vh;
+            body {
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                padding: 2rem;
-                position: relative;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-            
-            .header {
                 text-align: center;
-                margin-bottom: 4rem;
+                padding: 2rem;
             }
-            
             .logo {
-                font-size: 3rem;
+                font-size: 2.5rem;
                 font-weight: 700;
-                background: linear-gradient(135deg, #7877C6 0%, #FF7675 100%);
+                color: #FFFFFF;
+                margin-bottom: 1rem;
+                letter-spacing: -0.02em;
+            }
+            .error-code {
+                font-size: 8rem;
+                font-weight: 800;
+                background: linear-gradient(135deg, #9650FA 0%, #B98CFF 100%);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
                 margin-bottom: 1rem;
-                letter-spacing: -0.02em;
             }
-            
-            .tagline {
-                font-size: 1.2rem;
-                color: #7d8590;
-                font-weight: 400;
+            .error-message {
+                font-size: 1.5rem;
+                font-weight: 600;
                 margin-bottom: 0.5rem;
             }
-            
-            .subtitle {
-                font-size: 1rem;
-                color: #656d76;
-                font-weight: 300;
-            }
-            
-            .error-section {
-                text-align: center;
-                margin-bottom: 4rem;
-            }
-            
-            .error-code {
-                font-size: 10rem;
-                font-weight: 700;
-                background: linear-gradient(135deg, #7877C6 0%, #FF7675 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                margin-bottom: 1.5rem;
-                line-height: 1;
-                letter-spacing: -0.02em;
-            }
-            
-            .error-message {
-                font-size: 2rem;
-                font-weight: 600;
-                color: #e6edf3;
-                margin-bottom: 1rem;
-            }
-            
             .error-description {
-                font-size: 1.1rem;
+                font-size: 1rem;
                 color: #7d8590;
-                max-width: 600px;
-                margin: 0 auto 2.5rem;
-                line-height: 1.7;
+                max-width: 500px;
+                line-height: 1.6;
             }
-            
-            
-            .breadcrumb {
-                position: absolute;
-                top: 2rem;
-                left: 2rem;
-                font-size: 0.9rem;
-                color: #7d8590;
-            }
-            
-            
-            
             @media (max-width: 768px) {
                 .error-code {
-                    font-size: 7rem;
+                    font-size: 5rem;
                 }
-                
                 .logo {
-                    font-size: 2.5rem;
+                    font-size: 2rem;
                 }
-                
                 .error-message {
-                    font-size: 1.5rem;
-                }
-                
-                
-                .breadcrumb {
-                    position: static;
-                    margin-bottom: 2rem;
+                    font-size: 1.25rem;
                 }
             }
         </style>
     </head>
     <body>
-        <div class="background"></div>
-        
-        <div class="breadcrumb">
-            XQUARE Infrastructure / 404 Error
-        </div>
-        
-        
-        <div class="container">
-            <div class="header">
-                <div class="logo">XQUARE</div>
-                <div class="tagline">DSM을 위한 통합 인프라 서비스</div>
-                <div class="subtitle">Production-Ready Infrastructure Platform</div>
-            </div>
-            
-            <div class="error-section">
-                <div class="error-code">404</div>
-                <div class="error-message">서비스를 찾을 수 없습니다</div>
-                <div class="error-description">
-                    요청하신 서비스가 아직 배포되지 않았거나 존재하지 않습니다.<br>
-                    서비스 배포 상태를 확인하고 다시 시도해주세요.
-                </div>
-            </div>
-            
-        </div>
+    <div class="logo">XQUARE</div>
+    <div class="error-code">404</div>
+    <div class="error-message">서비스를 찾을 수 없습니다</div>
+    <div class="error-description">
+        요청하신 서비스가 존재하지 않거나 배포되지 않았습니다.<br>
+        서비스 상태를 확인 후 다시 시도해주세요.
+    </div>
     </body>
     </html>
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: custom-404-nginx-config
-  namespace: {{ .Release.Namespace | default "default" }}
-data:
-  default.conf: |
-    server {
-        listen 80;
-        server_name _;
-        root /usr/share/nginx/html;
-        index index.html;
-
-        location / {
-            try_files $uri $uri/ /index.html;
-        }
-
-        error_page 404 /index.html;
-    }
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
