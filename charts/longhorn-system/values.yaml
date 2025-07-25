@@ -3,6 +3,28 @@ longhorn:
     defaultDataPath: /var/lib/longhorn
     defaultDataLocality: best-effort
     replicaAutoBalance: best-effort
+    replicaSoftAntiAffinity: true
+    replicaZoneSoftAntiAffinity: true
+    defaultReplicaCount: 3
+    storageMinimalAvailablePercentage: 25
+    storageOverProvisioningPercentage: 200
+    allowVolumeCreationWithDegradedAvailability: false
+    fastReplicaRebuildEnabled: true
+    offlineRelicaRebuilding: true
+    orphanResourceAutoDeletion: "instance"
+    autoCleanupSnapshotWhenDeleteBackup: true
+    snapshotDataIntegrity: enabled
+    concurrentReplicaRebuildPerNodeLimit: 5
+    systemManagedPodsImagePullPolicy: IfNotPresent
+    replicaDiskSoftAntiAffinity: true
+    guaranteedInstanceManagerCPU: 12
+    nodeDrainPolicy: block-if-contains-last-replica
+    autoCleanupSystemGeneratedSnapshot: true
+    longGRPCTimeOut: 1800
 
   preUpgradeChecker:
     jobEnabled: false
+
+  persistence:
+    defaultClassReplicaCount: 3
+    defaultDataLocality: best-effort
