@@ -9,6 +9,14 @@ cloudflare-tunnel-remote:
     pullPolicy: IfNotPresent
     tag: "latest"
 
+  tolerations:
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -17,5 +25,15 @@ cloudflare-tunnel-remote:
               - key: "app.kubernetes.io/name"
                 operator: In
                 values:
-                  - "cloudflare-tunnel"
+                  - "cloudflare-tunnel-remote"
           topologyKey: "kubernetes.io/hostname"
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: "app.kubernetes.io/name"
+                  operator: In
+                  values:
+                    - "cloudflare-tunnel-remote"
+            topologyKey: "topology.kubernetes.io/zone"
