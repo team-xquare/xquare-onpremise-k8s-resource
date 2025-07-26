@@ -2,7 +2,7 @@ cloudflare-tunnel-remote:
   cloudflare:
     tunnel_token: <path:avp/data/cloudflare-tunnel-remote/#tunnel_token>
 
-  replicaCount: 7
+  replicaCount: 4
 
   image:
     repository: cloudflare/cloudflared
