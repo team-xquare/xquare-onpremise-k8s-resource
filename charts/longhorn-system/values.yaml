@@ -10,7 +10,10 @@ longhorn:
     storageOverProvisioningPercentage: 200
     allowVolumeCreationWithDegradedAvailability: false
     fastReplicaRebuildEnabled: true
+
     offlineRelicaRebuilding: true
+    # offlineReplicaRebuilding: true
+
     orphanResourceAutoDeletion: "instance"
     autoCleanupSnapshotWhenDeleteBackup: true
     snapshotDataIntegrity: enabled
