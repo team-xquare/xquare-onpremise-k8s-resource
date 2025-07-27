@@ -12,7 +12,7 @@ longhorn:
     fastReplicaRebuildEnabled: true
 
     offlineRelicaRebuilding: true
-    # offlineReplicaRebuilding: true
+    # offlineReplicaRebuilding: true - v1.10.0
 
     orphanResourceAutoDeletion: "instance"
     autoCleanupSnapshotWhenDeleteBackup: true
