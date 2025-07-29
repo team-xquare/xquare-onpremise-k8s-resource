@@ -17,3 +17,15 @@ certificate:
   dnsNames:
     - "*.dsmhs.kr"
     - "dsmhs.kr"
+
+    - "*.dsm-dms.com"
+    - "dsm-dms.com"
+
+    - "*.dsm-pick.com"
+    - "dsm-pick.com"
+
+    - "*.entrydsm.hs.kr"
+    - "entrydsm.hs.kr"
+
+    - "*.dsm-repo.com"
+    - "dsm-repo.com"
