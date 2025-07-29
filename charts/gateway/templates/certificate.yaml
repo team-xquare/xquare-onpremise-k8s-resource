@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-dsmhs-tls
+  namespace: {{ .Release.Namespace | default "default" }}
+spec:
+  secretName: wildcard-dsmhs-tls
+  issuerRef:
+    name: letsencrypt-issuer
+    kind: ClusterIssuer
+  dnsNames:
+{{- range .Values.certificate.dnsNames }}
+  - {{ . | quote }}
+{{- end }}

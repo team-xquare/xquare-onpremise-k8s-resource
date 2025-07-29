@@ -4,8 +4,6 @@ kind: Gateway
 metadata:
   name: internal-gateway
   namespace: {{ .Release.Namespace | default "default" }}
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-issuer
 spec:
   gatewayClassName: cilium
   infrastructure:
@@ -15,14 +13,12 @@ spec:
   - name: http
     port: 80
     protocol: HTTP
-    hostname: "*.dsmhs.kr"
     allowedRoutes:
       namespaces:
         from: All
   - name: https
     port: 443
     protocol: HTTPS
-    hostname: "*.dsmhs.kr"
     allowedRoutes:
       namespaces:
         from: All

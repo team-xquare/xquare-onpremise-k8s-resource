@@ -12,3 +12,8 @@ ippool:
 
 custom404:
   enabled: true
+
+certificate:
+  dnsNames:
+    - "*.dsmhs.kr"
+    - "dsmhs.kr"
