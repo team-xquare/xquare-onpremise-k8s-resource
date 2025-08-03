@@ -3,22 +3,23 @@ loki-stack:
     enabled: true
     image:
       repository: grafana/loki
-      tag: "3.5.3"
+      tag: "2.9.8"
       pullPolicy: IfNotPresent
     persistence:
       enabled: true
       size: 30Gi
     config:
       limits_config:
+        enforce_metric_name: false
         reject_old_samples: true
         reject_old_samples_max_age: 168h
         retention_period: 30d
       schema_config:
         configs:
           - from: 2025-01-16
-            store: tsdb
+            store: boltdb-shipper
             object_store: filesystem
-            schema: v13
+            schema: v11
             index:
               prefix: index_
               period: 24h
