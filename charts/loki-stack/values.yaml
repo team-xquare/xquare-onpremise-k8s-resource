@@ -3,7 +3,7 @@ loki-stack:
     enabled: true
     persistence:
       enabled: true
-      size: 15Gi
+      size: 30Gi
     config:
       limits_config:
         enforce_metric_name: false
@@ -20,21 +20,21 @@ loki-stack:
               period: 24h
     resources:
       requests:
-        cpu: 100m
-        memory: 256Mi
+        cpu: 200m
+        memory: 400Mi
       limits:
-        cpu: 300m
-        memory: 512Mi
+        cpu: 600m
+        memory: 1Gi
 
   promtail:
     enabled: true
     resources:
       requests:
-        cpu: 50m
-        memory: 128Mi
+        cpu: 80m
+        memory: 200Mi
       limits:
-        cpu: 150m
-        memory: 256Mi
+        cpu: 250m
+        memory: 400Mi
     tolerations:
       - operator: Exists
         effect: NoSchedule
