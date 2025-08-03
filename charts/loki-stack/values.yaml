@@ -35,8 +35,6 @@ loki-stack:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
         effect: NoSchedule
-    daemonset:
-      enabled: true
   grafana:
     enabled: false
   prometheus:
