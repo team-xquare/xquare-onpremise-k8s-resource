@@ -109,7 +109,7 @@ kube-prometheus-stack:
         editable: false
       - name: Loki
         type: loki
-        url: http://monitoring-loki:3100
+        url: http://monitoring-loki:3100/
         access: proxy
         editable: false
 
