@@ -1,29 +1,40 @@
 loki-stack:
-  enabled: true
   loki:
     enabled: true
     persistence:
       enabled: true
       size: 15Gi
-    resources:
-      requests:
-        cpu: 80m
-        memory: 200Mi
-      limits:
-        cpu: 200m
-        memory: 400Mi
     config:
       limits_config:
-        retention_period: 30d
+        enforce_metric_name: false
+        reject_old_samples: true
+        reject_old_samples_max_age: 168h
+      schema_config:
+        configs:
+          - from: 2025-01-16
+            store: boltdb-shipper
+            object_store: filesystem
+            schema: v11
+            index:
+              prefix: index_
+              period: 24h
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 300m
+        memory: 512Mi
+
   promtail:
     enabled: true
     resources:
       requests:
-        cpu: 30m
-        memory: 100Mi
+        cpu: 50m
+        memory: 128Mi
       limits:
-        cpu: 80m
-        memory: 200Mi
+        cpu: 150m
+        memory: 256Mi
     tolerations:
       - operator: Exists
         effect: NoSchedule
