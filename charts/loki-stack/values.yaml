@@ -1,0 +1,51 @@
+loki-stack:
+  enabled: true
+  loki:
+    enabled: true
+    persistence:
+      enabled: true
+      size: 15Gi
+    resources:
+      requests:
+        cpu: 80m
+        memory: 200Mi
+      limits:
+        cpu: 200m
+        memory: 400Mi
+    config:
+      limits_config:
+        retention_period: 30d
+  promtail:
+    enabled: true
+    resources:
+      requests:
+        cpu: 30m
+        memory: 100Mi
+      limits:
+        cpu: 80m
+        memory: 200Mi
+    tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    daemonset:
+      enabled: true
+  grafana:
+    enabled: false
+  prometheus:
+    enabled: false
+  filebeat:
+    enabled: false
+  fluent-bit:
+    enabled: false
+  logstash:
+    enabled: false
+  serviceMonitor:
+    enabled: true

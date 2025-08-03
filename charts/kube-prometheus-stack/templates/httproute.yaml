@@ -2,7 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: grafana
-  namespace: monitoring
+  namespace: kube-prometheus-stack
 spec:
   parentRefs:
     - name: internal-gateway
@@ -19,14 +19,14 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: monitoring-grafana
+        - name: kube-prometheus-stack-grafana
           port: 80
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: prometheus
-  namespace: monitoring
+  namespace: kube-prometheus-stack
 spec:
   parentRefs:
     - name: internal-gateway
@@ -43,14 +43,14 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: monitoring-kube-prometheus-prometheus
+        - name: kube-prometheus-stack-kube-prometheus-prometheus
           port: 9090
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: alertmanager
-  namespace: monitoring
+  namespace: kube-prometheus-stack
 spec:
   parentRefs:
     - name: internal-gateway
@@ -67,29 +67,5 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: monitoring-kube-prometheus-alertmanager
+        - name: kube-prometheus-stack-kube-prometheus-alertmanager
           port: 9093
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: loki
-  namespace: monitoring
-spec:
-  parentRefs:
-    - name: internal-gateway
-      namespace: gateway
-      sectionName: http
-    - name: internal-gateway
-      namespace: gateway
-      sectionName: https
-  hostnames:
-    - loki-xquare-infra.dsmhs.kr
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: monitoring-loki
-          port: 3100
