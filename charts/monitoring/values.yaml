@@ -159,7 +159,6 @@ loki-stack:
     config:
       limits_config:
         retention_period: 30d
-        volume_enabled: true
   promtail:
     enabled: true
     resources:
