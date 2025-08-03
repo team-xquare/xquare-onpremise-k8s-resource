@@ -104,13 +104,11 @@ kube-prometheus-stack:
     additionalDataSources:
       - name: Alertmanager
         type: alertmanager
-        url: http://kube-prometheus-stack-kube-prometheus-alertmanager:9093
-        access: proxy
+        url: http://kube-prometheus-stack-alertmanager:9093
         editable: false
       - name: Loki
         type: loki
         url: http://loki-stack.loki-stack.svc.cluster.local:3100
-        access: proxy
         editable: false
 
 prometheus-smartctl-exporter:
