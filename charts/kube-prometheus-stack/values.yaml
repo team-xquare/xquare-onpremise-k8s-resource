@@ -102,10 +102,6 @@ kube-prometheus-stack:
         enabled: true
         org_role: Admin
     additionalDataSources:
-      - name: Alertmanager
-        type: alertmanager
-        url: http://kube-prometheus-stack-alertmanager:9093
-        editable: false
       - name: Loki
         type: loki
         url: http://loki-stack.loki-stack.svc.cluster.local:3100
