@@ -181,3 +181,15 @@ loki-stack:
         effect: NoSchedule
     daemonset:
       enabled: true
+  grafana:
+    enabled: false
+  prometheus:
+    enabled: false
+  filebeat:
+    enabled: false
+  fluent-bit:
+    enabled: false
+  logstash:
+    enabled: false
+  serviceMonitor:
+    enabled: true
