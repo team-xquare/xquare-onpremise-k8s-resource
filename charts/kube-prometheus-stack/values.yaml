@@ -105,7 +105,6 @@ kube-prometheus-stack:
       - name: Loki
         type: loki
         url: http://loki-stack.loki-stack.svc.cluster.local:3100
-        editable: false
 
 prometheus-smartctl-exporter:
   enabled: true
