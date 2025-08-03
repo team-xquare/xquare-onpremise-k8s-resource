@@ -27,24 +27,21 @@ kube-prometheus-stack:
     enabled: true
     resources:
       requests:
-        cpu: 200m
-        memory: 256Mi
+        cpu: 150m
+        memory: 200Mi
       limits:
-        cpu: 500m
-        memory: 512Mi
-    tolerations:
-      - key: "role"
-        operator: "Equal"
-        value: "monitoring"
-        effect: "NoSchedule"
+        cpu: 300m
+        memory: 400Mi
 
   kubeStateMetrics:
     enabled: true
-    tolerations:
-      - key: "role"
-        operator: "Equal"
-        value: "monitoring"
-        effect: "NoSchedule"
+    resources:
+      requests:
+        cpu: 10m
+        memory: 50Mi
+      limits:
+        cpu: 30m
+        memory: 100Mi
 
   prometheus:
     enabled: true
@@ -55,61 +52,49 @@ kube-prometheus-stack:
       ruleSelector: {}
       resources:
         requests:
-          cpu: 350m
-          memory: 5Gi
+          cpu: 300m
+          memory: 3Gi
         limits:
-          cpu: 400m
-          memory: 7Gi
+          cpu: 800m
+          memory: 5Gi
       storageSpec:
         volumeClaimTemplate:
           spec:
             resources:
               requests:
-                storage: 20Gi
-      tolerations:
-        - key: "role"
-          operator: "Equal"
-          value: "monitoring"
-          effect: "NoSchedule"
+                storage: 30Gi
 
   alertmanager:
     enabled: true
     alertmanagerSpec:
       resources:
         requests:
-          cpu: 10m
-          memory: 32Mi
+          cpu: 15m
+          memory: 50Mi
+        limits:
+          cpu: 80m
+          memory: 100Mi
       storage:
         volumeClaimTemplate:
           spec:
             resources:
               requests:
-                storage: 5Gi
-      tolerations:
-        - key: "role"
-          operator: "Equal"
-          value: "monitoring"
-          effect: "NoSchedule"
+                storage: 8Gi
 
   grafana:
     enabled: true
     resources:
       requests:
         cpu: 50m
-        memory: 256Mi
+        memory: 200Mi
       limits:
-        cpu: 200m
-        memory: 512Mi
+        cpu: 150m
+        memory: 400Mi
     persistence:
       enabled: true
-      size: 10Gi
+      size: 15Gi
     ingress:
       enabled: false
-    tolerations:
-      - key: "role"
-        operator: "Equal"
-        value: "monitoring"
-        effect: "NoSchedule"
     grafana.ini:
       auth:
         disable_login_form: true
@@ -127,27 +112,21 @@ kube-prometheus-stack:
         url: http://kube-prometheus-stack-alertmanager:9093
         access: proxy
         editable: false
+      - name: Loki
+        type: loki
+        url: http://loki-stack:3100
+        access: proxy
+        editable: false
 
 prometheus-smartctl-exporter:
   enabled: true
   resources:
     requests:
-      cpu: 20m
-      memory: 40Mi
+      cpu: 15m
+      memory: 30Mi
     limits:
-      cpu: 100m
-      memory: 80Mi
-  tolerations:
-    - operator: Exists
-      effect: NoSchedule
-    - operator: Exists
-      effect: NoExecute
-    - key: node-role.kubernetes.io/master
-      operator: Exists
-      effect: NoSchedule
-    - key: node-role.kubernetes.io/control-plane
-      operator: Exists
-      effect: NoSchedule
+      cpu: 60m
+      memory: 60Mi
   serviceMonitor:
     enabled: true
   securityContext:
@@ -160,21 +139,50 @@ prometheus-ipmi-exporter:
       cpu: 10m
       memory: 30Mi
     limits:
-      cpu: 50m
-      memory: 50Mi
-  tolerations:
-    - operator: Exists
-      effect: NoSchedule
-    - operator: Exists
-      effect: NoExecute
-    - key: node-role.kubernetes.io/master
-      operator: Exists
-      effect: NoSchedule
-    - key: node-role.kubernetes.io/control-plane
-      operator: Exists
-      effect: NoSchedule
+      cpu: 40m
+      memory: 60Mi
   serviceMonitor:
     enabled: true
   securityContext:
     privileged: true
     hostNetwork: true
+
+loki-stack:
+  enabled: true
+  loki:
+    enabled: true
+    persistence:
+      enabled: true
+      size: 15Gi
+    resources:
+      requests:
+        cpu: 80m
+        memory: 200Mi
+      limits:
+        cpu: 200m
+        memory: 400Mi
+    config:
+      limits_config:
+        retention_period: 30d
+  promtail:
+    enabled: true
+    resources:
+      requests:
+        cpu: 30m
+        memory: 100Mi
+      limits:
+        cpu: 80m
+        memory: 200Mi
+    tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
+      - key: node-role.kubernetes.io/master
+        operator: Exists
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    daemonset:
+      enabled: true
