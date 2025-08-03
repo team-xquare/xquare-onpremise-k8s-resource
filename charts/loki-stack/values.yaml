@@ -1,6 +1,10 @@
 loki-stack:
   loki:
     enabled: true
+    image:
+      repository: grafana/loki
+      tag: "3.5.3"
+      pullPolicy: IfNotPresent
     persistence:
       enabled: true
       size: 30Gi
