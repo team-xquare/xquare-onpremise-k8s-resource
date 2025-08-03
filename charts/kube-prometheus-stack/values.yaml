@@ -141,4 +141,3 @@ prometheus-ipmi-exporter:
   securityContext:
     privileged: true
     hostNetwork: true
-
