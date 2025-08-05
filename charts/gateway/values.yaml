@@ -21,9 +21,6 @@ certificate:
     - "*.dsm-dms.com"
     - "dsm-dms.com"
 
-    - "*.dsm-pick.com"
-    - "dsm-pick.com"
-
     - "*.entrydsm.hs.kr"
     - "entrydsm.hs.kr"
 
