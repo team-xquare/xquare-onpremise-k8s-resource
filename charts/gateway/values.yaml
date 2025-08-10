@@ -18,8 +18,8 @@ certificate:
     - "*.dsmhs.kr"
     - "dsmhs.kr"
 
-    - "*.dsm-dms.com"
-    - "dsm-dms.com"
+    - "*.dms-dsm.com"
+    - "dms-dsm.com"
 
     - "*.entrydsm.hs.kr"
     - "entrydsm.hs.kr"
