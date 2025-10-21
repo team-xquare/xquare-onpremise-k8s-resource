@@ -22,9 +22,3 @@ cloudflare-tunnel-remote:
                 values:
                   - "cloudflared"
           topologyKey: "kubernetes.io/hostname"
-
-  args:
-    - tunnel
-    - run
-    - --resolver
-    - 1.1.1.1
