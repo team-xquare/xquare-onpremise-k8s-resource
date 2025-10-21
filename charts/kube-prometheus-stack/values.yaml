@@ -62,7 +62,7 @@ kube-prometheus-stack:
           spec:
             resources:
               requests:
-                storage: 50Gi
+                storage: 60Gi
 
   alertmanager:
     enabled: true
@@ -79,7 +79,7 @@ kube-prometheus-stack:
           spec:
             resources:
               requests:
-                storage: 15Gi
+                storage: 10Gi
 
   grafana:
     enabled: true
