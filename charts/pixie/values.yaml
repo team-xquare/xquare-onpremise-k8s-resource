@@ -5,7 +5,7 @@ pixie-operator-chart:
 
   dataAccess: "Restricted"
   disableAutoUpdate: false
-  deployOLM: true
+  deployOLM: false
 
   patches: {}
 
