@@ -301,17 +301,21 @@ alloy:
     configMap:
       create: true
       content: |-
+        // ============================================================================
+        // Remote Write Endpoints
+        // ============================================================================
+
         prometheus.remote_write "default" {
           endpoint {
             url = "http://monitoring-prometheus-server:80/api/v1/write"
             queue_config {
-              capacity = 10000
-              max_shards = 10
-              min_shards = 1
+              capacity             = 10000
+              max_shards           = 10
+              min_shards           = 1
               max_samples_per_send = 5000
-              batch_send_deadline = "5s"
-              min_backoff = "30ms"
-              max_backoff = "5s"
+              batch_send_deadline  = "5s"
+              min_backoff          = "30ms"
+              max_backoff          = "5s"
             }
           }
         }
@@ -331,46 +335,12 @@ alloy:
           }
         }
 
-        prometheus.exporter.unix "node" {
-          include_exporter_metrics = true
-          filesystem {
-            mount_points_exclude = "^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"
-            fs_types_exclude = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
-          }
-        }
-
-        prometheus.scrape "node_exporter" {
-          targets    = prometheus.exporter.unix.node.targets
-          forward_to = [prometheus.remote_write.default.receiver]
-          scrape_interval = "30s"
-        }
+        // ============================================================================
+        // Kubernetes Discovery
+        // ============================================================================
 
         discovery.kubernetes "pods" {
           role = "pod"
-        }
-
-        discovery.relabel "pod_logs" {
-          targets = discovery.kubernetes.pods.targets
-
-          rule {
-            source_labels = ["__meta_kubernetes_namespace"]
-            target_label = "namespace"
-          }
-
-          rule {
-            source_labels = ["__meta_kubernetes_pod_name"]
-            target_label = "pod"
-          }
-
-          rule {
-            source_labels = ["__meta_kubernetes_pod_container_name"]
-            target_label = "container"
-          }
-
-          rule {
-            source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
-            target_label = "app"
-          }
         }
 
         discovery.kubernetes "nodes" {
@@ -385,73 +355,130 @@ alloy:
           role = "endpoints"
         }
 
-        prometheus.scrape "kubelet_cadvisor" {
-          targets = discovery.kubernetes.nodes.targets
-          scheme  = "https"
-          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-          tls_config {
-            ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-            insecure_skip_verify = false
+        // ============================================================================
+        // Metrics Collection - Node Exporter
+        // ============================================================================
+
+        prometheus.exporter.unix "node" {
+          include_exporter_metrics = true
+          filesystem {
+            mount_points_exclude = "^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"
+            fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
           }
-          metrics_path = "/metrics/cadvisor"
-          scrape_interval = "30s"
-          forward_to = [prometheus.remote_write.default.receiver]
         }
 
+        prometheus.scrape "node_exporter" {
+          targets         = prometheus.exporter.unix.node.targets
+          forward_to      = [prometheus.remote_write.default.receiver]
+          scrape_interval = "30s"
+        }
+
+        // ============================================================================
+        // Metrics Collection - Kubernetes Components
+        // ============================================================================
+
         prometheus.scrape "kubelet" {
-          targets = discovery.kubernetes.nodes.targets
-          scheme  = "https"
-          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          targets               = discovery.kubernetes.nodes.targets
+          scheme                = "https"
+          bearer_token_file     = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          metrics_path          = "/metrics"
+          scrape_interval       = "30s"
+          forward_to            = [prometheus.remote_write.default.receiver]
           tls_config {
-            ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
             insecure_skip_verify = false
           }
-          metrics_path = "/metrics"
-          scrape_interval = "30s"
-          forward_to = [prometheus.remote_write.default.receiver]
+        }
+
+        prometheus.scrape "kubelet_cadvisor" {
+          targets               = discovery.kubernetes.nodes.targets
+          scheme                = "https"
+          bearer_token_file     = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          metrics_path          = "/metrics/cadvisor"
+          scrape_interval       = "30s"
+          forward_to            = [prometheus.remote_write.default.receiver]
+          tls_config {
+            ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            insecure_skip_verify = false
+          }
         }
 
         prometheus.scrape "kube_apiserver" {
           targets = [{
             __address__ = "kubernetes.default.svc.cluster.local:443",
           }]
-          scheme = "https"
-          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          scheme                = "https"
+          bearer_token_file     = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          metrics_path          = "/metrics"
+          scrape_interval       = "30s"
+          forward_to            = [prometheus.remote_write.default.receiver]
           tls_config {
-            ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
             insecure_skip_verify = false
           }
-          metrics_path = "/metrics"
-          scrape_interval = "30s"
-          forward_to = [prometheus.remote_write.default.receiver]
         }
+
+        // ============================================================================
+        // Metrics Collection - Service Monitors
+        // ============================================================================
 
         discovery.relabel "service_monitors" {
           targets = discovery.kubernetes.services.targets
+
           rule {
             source_labels = ["__meta_kubernetes_service_annotation_prometheus_io_scrape"]
-            action = "keep"
-            regex = "true"
+            action        = "keep"
+            regex         = "true"
           }
+
           rule {
             source_labels = ["__meta_kubernetes_service_annotation_prometheus_io_path"]
-            action = "replace"
-            target_label = "__metrics_path__"
-            regex = "(.+)"
+            action        = "replace"
+            target_label  = "__metrics_path__"
+            regex         = "(.+)"
           }
+
           rule {
             source_labels = ["__address__", "__meta_kubernetes_service_annotation_prometheus_io_port"]
-            action = "replace"
-            target_label = "__address__"
-            regex = "([^:]+)(?::\\d+)?;(\\d+)"
-            replacement = "$1:$2"
+            action        = "replace"
+            target_label  = "__address__"
+            regex         = "([^:]+)(?::\\d+)?;(\\d+)"
+            replacement   = "$1:$2"
           }
         }
 
         prometheus.scrape "service_monitors" {
-          targets = discovery.relabel.service_monitors.output
-          forward_to = [prometheus.remote_write.default.receiver]
+          targets         = discovery.relabel.service_monitors.output
+          forward_to      = [prometheus.remote_write.default.receiver]
           scrape_interval = "30s"
+        }
+
+        // ============================================================================
+        // Logs Collection
+        // ============================================================================
+
+        discovery.relabel "pod_logs" {
+          targets = discovery.kubernetes.pods.targets
+
+          rule {
+            source_labels = ["__meta_kubernetes_namespace"]
+            target_label  = "namespace"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_name"]
+            target_label  = "pod"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_container_name"]
+            target_label  = "container"
+          }
+
+          rule {
+            source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+            target_label  = "app"
+          }
         }
 
         loki.source.kubernetes "pods" {
@@ -465,9 +492,12 @@ alloy:
               cluster = "xquare-onpremise",
             }
           }
-
           forward_to = [loki.write.default.receiver]
         }
+
+        // ============================================================================
+        // Traces Collection
+        // ============================================================================
 
         otelcol.receiver.otlp "default" {
           grpc {
