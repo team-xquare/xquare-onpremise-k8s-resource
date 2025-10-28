@@ -129,6 +129,10 @@ loki:
   backend:
     replicas: 0
 
+  lokiCanary:
+    enabled: true
+    lokiurl: http://monitoring-loki:3100
+
 tempo:
   enabled: true
 
