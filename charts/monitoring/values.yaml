@@ -431,6 +431,7 @@ alloy:
         loki.source.kubernetes "pods" {
           targets    = discovery.kubernetes.pods.targets
           forward_to = [loki.write.default.receiver]
+          tail_from_end = true
         }
 
         otelcol.receiver.otlp "default" {
