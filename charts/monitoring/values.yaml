@@ -260,32 +260,36 @@ grafana:
 alloy:
   enabled: true
 
-  alloy:
-    mode: daemonset
-    image:
-      repository: grafana/alloy
-      tag: v1.5.1
-      pullPolicy: IfNotPresent
-    resources:
-      requests:
-        cpu: 200m
-        memory: 300Mi
-      limits:
-        cpu: 500m
-        memory: 800Mi
-    tolerations:
-      - operator: Exists
-        effect: NoSchedule
-      - operator: Exists
-        effect: NoExecute
-    securityContext:
-      privileged: false
-      runAsUser: 0
-      runAsGroup: 0
-      capabilities:
-        add:
-          - SYS_ADMIN
-    configMap:
+  mode: daemonset
+
+  image:
+    repository: grafana/alloy
+    tag: v1.5.1
+    pullPolicy: IfNotPresent
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 300Mi
+    limits:
+      cpu: 500m
+      memory: 800Mi
+
+  tolerations:
+    - operator: Exists
+      effect: NoSchedule
+    - operator: Exists
+      effect: NoExecute
+
+  securityContext:
+    privileged: false
+    runAsUser: 0
+    runAsGroup: 0
+    capabilities:
+      add:
+        - SYS_ADMIN
+
+  configMap:
       create: true
       content: |-
         prometheus.remote_write "default" {
@@ -444,26 +448,28 @@ alloy:
           }
         }
 
-    mounts:
-      dockercontainers: false
+  mounts:
+    dockercontainers: false
+    extra:
+      - name: rootfs
+        mountPath: /host/root
+        readOnly: true
+      - name: sysfs
+        mountPath: /host/sys
+        readOnly: true
+      - name: procfs
+        mountPath: /host/proc
+        readOnly: true
+
+  controller:
+    volumes:
       extra:
         - name: rootfs
-          mountPath: /host/root
-          readOnly: true
+          hostPath:
+            path: /
         - name: sysfs
-          mountPath: /host/sys
-          readOnly: true
+          hostPath:
+            path: /sys
         - name: procfs
-          mountPath: /host/proc
-          readOnly: true
-
-    extraVolumes:
-      - name: rootfs
-        hostPath:
-          path: /
-      - name: sysfs
-        hostPath:
-          path: /sys
-      - name: procfs
-        hostPath:
-          path: /proc
+          hostPath:
+            path: /proc
