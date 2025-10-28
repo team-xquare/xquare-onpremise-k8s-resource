@@ -260,36 +260,37 @@ grafana:
 alloy:
   enabled: true
 
-  mode: daemonset
+  alloy:
+    mode: daemonset
 
-  image:
-    repository: grafana/alloy
-    tag: v1.5.1
-    pullPolicy: IfNotPresent
+    image:
+      repository: grafana/alloy
+      tag: v1.5.1
+      pullPolicy: IfNotPresent
 
-  resources:
-    requests:
-      cpu: 200m
-      memory: 300Mi
-    limits:
-      cpu: 500m
-      memory: 800Mi
+    resources:
+      requests:
+        cpu: 200m
+        memory: 300Mi
+      limits:
+        cpu: 500m
+        memory: 800Mi
 
-  tolerations:
-    - operator: Exists
-      effect: NoSchedule
-    - operator: Exists
-      effect: NoExecute
+    tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
 
-  securityContext:
-    privileged: false
-    runAsUser: 0
-    runAsGroup: 0
-    capabilities:
-      add:
-        - SYS_ADMIN
+    securityContext:
+      privileged: false
+      runAsUser: 0
+      runAsGroup: 0
+      capabilities:
+        add:
+          - SYS_ADMIN
 
-  configMap:
+    configMap:
       create: true
       content: |-
         prometheus.remote_write "default" {
@@ -448,18 +449,18 @@ alloy:
           }
         }
 
-  mounts:
-    dockercontainers: false
-    extra:
-      - name: rootfs
-        mountPath: /host/root
-        readOnly: true
-      - name: sysfs
-        mountPath: /host/sys
-        readOnly: true
-      - name: procfs
-        mountPath: /host/proc
-        readOnly: true
+    mounts:
+      dockercontainers: false
+      extra:
+        - name: rootfs
+          mountPath: /host/root
+          readOnly: true
+        - name: sysfs
+          mountPath: /host/sys
+          readOnly: true
+        - name: procfs
+          mountPath: /host/proc
+          readOnly: true
 
   controller:
     volumes:
