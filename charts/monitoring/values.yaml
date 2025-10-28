@@ -1,0 +1,455 @@
+prometheus:
+  enabled: true
+
+  server:
+    name: server
+    persistentVolume:
+      enabled: true
+      size: 60Gi
+      storageClass: ""
+    resources:
+      requests:
+        cpu: 500m
+        memory: 4Gi
+      limits:
+        cpu: 1200m
+        memory: 8Gi
+    retention: "30d"
+    global:
+      scrape_interval: 30s
+      scrape_timeout: 10s
+      evaluation_interval: 30s
+
+  alertmanager:
+    enabled: true
+    persistentVolume:
+      enabled: true
+      size: 10Gi
+      storageClass: ""
+    resources:
+      requests:
+        cpu: 25m
+        memory: 80Mi
+      limits:
+        cpu: 150m
+        memory: 200Mi
+
+  kubeStateMetrics:
+    enabled: true
+    resources:
+      requests:
+        cpu: 20m
+        memory: 80Mi
+      limits:
+        cpu: 60m
+        memory: 150Mi
+
+  nodeExporter:
+    enabled: false
+
+  pushgateway:
+    enabled: false
+
+loki:
+  enabled: true
+
+  deploymentMode: SingleBinary
+
+  loki:
+    image:
+      repository: grafana/loki
+      tag: "3.3.2"
+      pullPolicy: IfNotPresent
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    storage:
+      type: filesystem
+    limits_config:
+      enforce_metric_name: false
+      reject_old_samples: true
+      reject_old_samples_max_age: 168h
+      max_cache_freshness_per_query: 10m
+      split_queries_by_interval: 15m
+      retention_period: 30d
+    schemaConfig:
+      configs:
+        - from: 2025-01-16
+          store: tsdb
+          object_store: filesystem
+          schema: v13
+          index:
+            prefix: index_
+            period: 24h
+    resources:
+      requests:
+        cpu: 200m
+        memory: 400Mi
+      limits:
+        cpu: 600m
+        memory: 1Gi
+
+  singleBinary:
+    replicas: 1
+    persistence:
+      enabled: true
+      size: 30Gi
+      storageClass: ""
+    resources:
+      requests:
+        cpu: 200m
+        memory: 400Mi
+      limits:
+        cpu: 600m
+        memory: 1Gi
+
+  test:
+    enabled: false
+
+  monitoring:
+    selfMonitoring:
+      enabled: false
+      grafanaAgent:
+        installOperator: false
+
+  gateway:
+    enabled: false
+
+  promtail:
+    enabled: false
+
+  grafana:
+    enabled: false
+
+tempo:
+  enabled: true
+
+  tempo:
+    repository: grafana/tempo
+    tag: "2.7.2"
+    pullPolicy: IfNotPresent
+    storage:
+      trace:
+        backend: local
+        local:
+          path: /var/tempo/traces
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
+      jaeger:
+        protocols:
+          thrift_http:
+            endpoint: "0.0.0.0:14268"
+          grpc:
+            endpoint: "0.0.0.0:14250"
+      zipkin:
+        endpoint: "0.0.0.0:9411"
+    resources:
+      requests:
+        cpu: 300m
+        memory: 1Gi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+  persistence:
+    enabled: true
+    size: 40Gi
+    storageClass: ""
+
+grafana:
+  enabled: true
+
+  image:
+    repository: grafana/grafana
+    tag: "11.4.0"
+    pullPolicy: IfNotPresent
+
+  persistence:
+    enabled: true
+    size: 25Gi
+    storageClassName: ""
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 300Mi
+    limits:
+      cpu: 300m
+      memory: 600Mi
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  grafana.ini:
+    server:
+      root_url: "https://grafana-xquare-infra.dsmhs.kr"
+      serve_from_sub_path: false
+    auth:
+      disable_login_form: true
+    auth.anonymous:
+      enabled: true
+      org_name: Main Org.
+      org_role: Admin
+    analytics:
+      reporting_enabled: false
+      check_for_updates: false
+
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://monitoring-prometheus-server.monitoring.svc.cluster.local:9090
+          isDefault: true
+          editable: false
+          jsonData:
+            timeInterval: 30s
+        - name: Loki
+          type: loki
+          access: proxy
+          url: http://monitoring-loki.monitoring.svc.cluster.local:3100
+          editable: false
+          jsonData:
+            maxLines: 1000
+        - name: Tempo
+          type: tempo
+          access: proxy
+          url: http://monitoring-tempo.monitoring.svc.cluster.local:3100
+          editable: false
+          jsonData:
+            httpMethod: GET
+            tracesToLogs:
+              datasourceUid: loki
+              tags: ['job', 'instance', 'pod', 'namespace']
+              mappedTags: [{ key: 'service.name', value: 'service' }]
+              mapTagNamesEnabled: false
+              spanStartTimeShift: '-1h'
+              spanEndTimeShift: '1h'
+              filterByTraceID: false
+              filterBySpanID: false
+            tracesToMetrics:
+              datasourceUid: prometheus
+              tags: [{ key: 'service.name', value: 'service' }, { key: 'job' }]
+              spanStartTimeShift: '-1h'
+              spanEndTimeShift: '1h'
+            serviceMap:
+              datasourceUid: prometheus
+            nodeGraph:
+              enabled: true
+
+  adminUser: admin
+  adminPassword: admin
+
+alloy:
+  enabled: true
+
+  alloy:
+    mode: daemonset
+    image:
+      repository: grafana/alloy
+      tag: v1.5.1
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 200m
+        memory: 300Mi
+      limits:
+        cpu: 500m
+        memory: 800Mi
+    tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
+    securityContext:
+      privileged: false
+      runAsUser: 0
+      runAsGroup: 0
+      capabilities:
+        add:
+          - SYS_ADMIN
+    configMap:
+      create: true
+      content: |-
+        prometheus.remote_write "default" {
+          endpoint {
+            url = "http://monitoring-prometheus-server.monitoring.svc.cluster.local:9090/api/v1/write"
+            queue_config {
+              capacity = 10000
+              max_shards = 10
+              min_shards = 1
+              max_samples_per_send = 5000
+              batch_send_deadline = "5s"
+              min_backoff = "30ms"
+              max_backoff = "5s"
+            }
+          }
+        }
+
+        loki.write "default" {
+          endpoint {
+            url = "http://monitoring-loki.monitoring.svc.cluster.local:3100/loki/api/v1/push"
+          }
+        }
+
+        otelcol.exporter.otlp "tempo" {
+          client {
+            endpoint = "monitoring-tempo.monitoring.svc.cluster.local:4317"
+            tls {
+              insecure = true
+            }
+          }
+        }
+
+        prometheus.exporter.unix "node" {
+          include_exporter_metrics = true
+          filesystem {
+            mount_points_exclude = "^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"
+            fs_types_exclude = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+          }
+        }
+
+        prometheus.scrape "node_exporter" {
+          targets    = prometheus.exporter.unix.node.targets
+          forward_to = [prometheus.remote_write.default.receiver]
+          scrape_interval = "30s"
+        }
+
+        discovery.kubernetes "pods" {
+          role = "pod"
+        }
+
+        discovery.kubernetes "nodes" {
+          role = "node"
+        }
+
+        discovery.kubernetes "services" {
+          role = "service"
+        }
+
+        discovery.kubernetes "endpoints" {
+          role = "endpoints"
+        }
+
+        prometheus.scrape "kubelet_cadvisor" {
+          targets = discovery.kubernetes.nodes.targets
+          scheme  = "https"
+          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          tls_config {
+            ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            insecure_skip_verify = false
+          }
+          metrics_path = "/metrics/cadvisor"
+          scrape_interval = "30s"
+          forward_to = [prometheus.remote_write.default.receiver]
+        }
+
+        prometheus.scrape "kubelet" {
+          targets = discovery.kubernetes.nodes.targets
+          scheme  = "https"
+          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          tls_config {
+            ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            insecure_skip_verify = false
+          }
+          metrics_path = "/metrics"
+          scrape_interval = "30s"
+          forward_to = [prometheus.remote_write.default.receiver]
+        }
+
+        prometheus.scrape "kube_apiserver" {
+          targets = [{
+            __address__ = "kubernetes.default.svc.cluster.local:443",
+          }]
+          scheme = "https"
+          bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+          tls_config {
+            ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            insecure_skip_verify = false
+          }
+          metrics_path = "/metrics"
+          scrape_interval = "30s"
+          forward_to = [prometheus.remote_write.default.receiver]
+        }
+
+        discovery.relabel "service_monitors" {
+          targets = discovery.kubernetes.services.targets
+          rule {
+            source_labels = ["__meta_kubernetes_service_annotation_prometheus_io_scrape"]
+            action = "keep"
+            regex = "true"
+          }
+          rule {
+            source_labels = ["__meta_kubernetes_service_annotation_prometheus_io_path"]
+            action = "replace"
+            target_label = "__metrics_path__"
+            regex = "(.+)"
+          }
+          rule {
+            source_labels = ["__address__", "__meta_kubernetes_service_annotation_prometheus_io_port"]
+            action = "replace"
+            target_label = "__address__"
+            regex = "([^:]+)(?::\\d+)?;(\\d+)"
+            replacement = "$1:$2"
+          }
+        }
+
+        prometheus.scrape "service_monitors" {
+          targets = discovery.relabel.service_monitors.output
+          forward_to = [prometheus.remote_write.default.receiver]
+          scrape_interval = "30s"
+        }
+
+        loki.source.kubernetes "pods" {
+          targets    = discovery.kubernetes.pods.targets
+          forward_to = [loki.write.default.receiver]
+        }
+
+        otelcol.receiver.otlp "default" {
+          grpc {
+            endpoint = "0.0.0.0:4317"
+          }
+          http {
+            endpoint = "0.0.0.0:4318"
+          }
+          output {
+            traces = [otelcol.exporter.otlp.tempo.input]
+          }
+        }
+
+        beyla.ebpf "auto_instrument" {
+          open_port = "8080-8090,3000,9090"
+          routes {
+            patterns = ["/api/*", "/v1/*"]
+          }
+          output {
+            traces = [otelcol.exporter.otlp.tempo.input]
+          }
+        }
+
+    mounts:
+      dockercontainers: false
+      extra:
+        - name: rootfs
+          mountPath: /host/root
+          readOnly: true
+          hostPath:
+            path: /
+        - name: sysfs
+          mountPath: /host/sys
+          readOnly: true
+          hostPath:
+            path: /sys
+        - name: procfs
+          mountPath: /host/proc
+          readOnly: true
+          hostPath:
+            path: /proc

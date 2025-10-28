@@ -2,7 +2,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: grafana
-  namespace: kube-prometheus-stack
+  namespace: monitoring
 spec:
   parentRefs:
     - name: internal-gateway
@@ -19,14 +19,14 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: kube-prometheus-stack-grafana
+        - name: monitoring-grafana
           port: 80
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: prometheus
-  namespace: kube-prometheus-stack
+  namespace: monitoring
 spec:
   parentRefs:
     - name: internal-gateway
@@ -43,14 +43,14 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: kube-prometheus-stack-kube-prometheus-prometheus
+        - name: monitoring-prometheus-server
           port: 9090
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: alertmanager
-  namespace: kube-prometheus-stack
+  namespace: monitoring
 spec:
   parentRefs:
     - name: internal-gateway
@@ -67,5 +67,53 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: kube-prometheus-stack-kube-prometheus-alertmanager
+        - name: monitoring-prometheus-alertmanager
           port: 9093
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: loki
+  namespace: monitoring
+spec:
+  parentRefs:
+    - name: internal-gateway
+      namespace: gateway
+      sectionName: http
+    - name: internal-gateway
+      namespace: gateway
+      sectionName: https
+  hostnames:
+    - loki-xquare-infra.dsmhs.kr
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: monitoring-loki
+          port: 3100
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tempo
+  namespace: monitoring
+spec:
+  parentRefs:
+    - name: internal-gateway
+      namespace: gateway
+      sectionName: http
+    - name: internal-gateway
+      namespace: gateway
+      sectionName: https
+  hostnames:
+    - tempo-xquare-infra.dsmhs.kr
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: monitoring-tempo
+          port: 3100
