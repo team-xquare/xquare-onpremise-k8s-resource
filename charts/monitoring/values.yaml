@@ -19,6 +19,8 @@ prometheus:
       scrape_interval: 30s
       scrape_timeout: 10s
       evaluation_interval: 30s
+    extraFlags:
+      - web.enable-remote-write-receiver
 
   alertmanager:
     enabled: true
@@ -131,7 +133,7 @@ loki:
 
   lokiCanary:
     enabled: true
-    lokiurl: http://monitoring-loki:3100
+    lokiurl: monitoring-loki:3100
 
 tempo:
   enabled: true
