@@ -450,15 +450,20 @@ alloy:
         - name: rootfs
           mountPath: /host/root
           readOnly: true
-          hostPath:
-            path: /
         - name: sysfs
           mountPath: /host/sys
           readOnly: true
-          hostPath:
-            path: /sys
         - name: procfs
           mountPath: /host/proc
           readOnly: true
-          hostPath:
-            path: /proc
+
+    extraVolumes:
+      - name: rootfs
+        hostPath:
+          path: /
+      - name: sysfs
+        hostPath:
+          path: /sys
+      - name: procfs
+        hostPath:
+          path: /proc
