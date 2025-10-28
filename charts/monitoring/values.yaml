@@ -266,9 +266,6 @@ grafana:
 alloy:
   enabled: true
 
-  rbac:
-    create: true
-
   alloy:
     mode: daemonset
 
