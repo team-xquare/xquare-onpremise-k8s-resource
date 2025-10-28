@@ -456,19 +456,19 @@ alloy:
 
         loki.source.kubernetes "pods" {
           targets    = discovery.relabel.pod_logs.output
-          forward_to = [loki.relabel.pod_logs.receiver]
-        }
-
-        loki.relabel "pod_logs" {
           forward_to = [loki.process.pod_logs.receiver]
-
-          rule {
-            action = "labelkeep"
-            regex = "namespace|pod|container|app"
-          }
         }
 
         loki.process "pod_logs" {
+          stage.label_keep {
+            values = [
+              "namespace",
+              "pod",
+              "container",
+              "app",
+            ]
+          }
+
           stage.static_labels {
             values = {
               cluster = "xquare-onpremise",
