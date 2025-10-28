@@ -21,6 +21,7 @@ prometheus:
       evaluation_interval: 30s
     extraFlags:
       - web.enable-remote-write-receiver
+      - web.enable-lifecycle
 
   alertmanager:
     enabled: true
