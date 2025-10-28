@@ -1,0 +1,19 @@
+pixie-operator-chart:
+  cloudAddr: "withpixie.ai:443"
+  clusterName: "xquare-infra-cluster"
+  customDeployKeySecret: "pixie-deploy-key"
+
+  dataAccess: "Restricted"
+  disableAutoUpdate: false
+  deployOLM: true
+
+  patches: {}
+
+  pemMemoryLimit: "2Gi"
+  pemMemoryRequest: "2Gi"
+
+  pod:
+    annotations: {}
+    labels: {}
+
+  useEtcdOperator: false
