@@ -460,15 +460,6 @@ alloy:
         }
 
         loki.process "pod_logs" {
-          stage.label_keep {
-            values = [
-              "namespace",
-              "pod",
-              "container",
-              "app",
-            ]
-          }
-
           stage.static_labels {
             values = {
               cluster = "xquare-onpremise",
