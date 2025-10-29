@@ -244,21 +244,21 @@ grafana:
           jsonData:
             httpMethod: GET
             tracesToLogs:
-              datasourceUid: loki
-              tags: ['job', 'instance', 'pod', 'namespace']
-              mappedTags: [{ key: 'service.name', value: 'service' }]
+              datasourceUid: Loki
+              tags: ["job", "instance", "pod", "namespace"]
+              mappedTags: [{ key: "service.name", value: "service" }]
               mapTagNamesEnabled: false
-              spanStartTimeShift: '-1h'
-              spanEndTimeShift: '1h'
+              spanStartTimeShift: "-1h"
+              spanEndTimeShift: "1h"
               filterByTraceID: false
               filterBySpanID: false
             tracesToMetrics:
-              datasourceUid: prometheus
-              tags: [{ key: 'service.name', value: 'service' }, { key: 'job' }]
-              spanStartTimeShift: '-1h'
-              spanEndTimeShift: '1h'
+              datasourceUid: Prometheus
+              tags: [{ key: "service.name", value: "service" }, { key: "job" }]
+              spanStartTimeShift: "-1h"
+              spanEndTimeShift: "1h"
             serviceMap:
-              datasourceUid: prometheus
+              datasourceUid: Prometheus
             nodeGraph:
               enabled: true
 
