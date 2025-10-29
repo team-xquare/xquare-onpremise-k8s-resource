@@ -239,7 +239,7 @@ grafana:
         - name: Tempo
           type: tempo
           access: proxy
-          url: http://monitoring-tempo:3100
+          url: http://monitoring-tempo:3200
           editable: false
           jsonData:
             httpMethod: GET
