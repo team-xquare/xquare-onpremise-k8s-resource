@@ -290,13 +290,18 @@ alloy:
       - operator: Exists
         effect: NoExecute
 
+    hostPID: true
+
     securityContext:
-      privileged: false
+      privileged: true
       runAsUser: 0
       runAsGroup: 0
       capabilities:
         add:
           - SYS_ADMIN
+          - SYS_PTRACE
+          - NET_RAW
+          - BPF
 
     configMap:
       create: true
