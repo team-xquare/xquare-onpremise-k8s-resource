@@ -474,10 +474,16 @@ alloy:
         }
 
         beyla.ebpf "auto_instrument" {
-          open_port = "8080-8090,3000,9090"
+          discovery {
+            instrument {
+              open_ports = "8080-8090,3000,9090"
+            }
+          }
+
           routes {
             patterns = ["/api/*", "/v1/*"]
           }
+
           output {
             traces = [otelcol.exporter.otlp.tempo.input]
           }
