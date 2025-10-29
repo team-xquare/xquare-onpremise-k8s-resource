@@ -293,15 +293,17 @@ alloy:
     hostPID: true
 
     securityContext:
-      privileged: true
+      privileged: false
       runAsUser: 0
       runAsGroup: 0
       capabilities:
         add:
-          - SYS_ADMIN
+          - BPF
           - SYS_PTRACE
           - NET_RAW
-          - BPF
+          - DAC_READ_SEARCH
+          - PERFMON
+          - SYS_ADMIN
 
     configMap:
       create: true
