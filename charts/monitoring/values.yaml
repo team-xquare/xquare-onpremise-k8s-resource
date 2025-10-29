@@ -347,14 +347,6 @@ alloy:
           role = "node"
         }
 
-        discovery.kubernetes "services" {
-          role = "service"
-        }
-
-        discovery.kubernetes "endpoints" {
-          role = "endpoints"
-        }
-
         // ============================================================================
         // Metrics Collection - Node Exporter
         // ============================================================================
@@ -416,41 +408,6 @@ alloy:
             ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
             insecure_skip_verify = false
           }
-        }
-
-        // ============================================================================
-        // Metrics Collection - Service Monitors
-        // ============================================================================
-
-        discovery.relabel "service_monitors" {
-          targets = discovery.kubernetes.services.targets
-
-          rule {
-            source_labels = ["__meta_kubernetes_service_annotation_prometheus_io_scrape"]
-            action        = "keep"
-            regex         = "true"
-          }
-
-          rule {
-            source_labels = ["__meta_kubernetes_service_annotation_prometheus_io_path"]
-            action        = "replace"
-            target_label  = "__metrics_path__"
-            regex         = "(.+)"
-          }
-
-          rule {
-            source_labels = ["__address__", "__meta_kubernetes_service_annotation_prometheus_io_port"]
-            action        = "replace"
-            target_label  = "__address__"
-            regex         = "([^:]+)(?::\\d+)?;(\\d+)"
-            replacement   = "$1:$2"
-          }
-        }
-
-        prometheus.scrape "service_monitors" {
-          targets         = discovery.relabel.service_monitors.output
-          forward_to      = [prometheus.remote_write.default.receiver]
-          scrape_interval = "30s"
         }
 
         // ============================================================================
