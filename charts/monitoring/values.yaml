@@ -482,10 +482,6 @@ alloy:
             }
           }
 
-          routes {
-            patterns = ["/api/*", "/v1/*"]
-          }
-
           output {
             traces = [otelcol.exporter.otlp.tempo.input]
           }
