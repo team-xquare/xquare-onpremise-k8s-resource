@@ -304,6 +304,8 @@ alloy:
           - CHECKPOINT_RESTORE
           - DAC_READ_SEARCH
           - PERFMON
+          - NET_ADMIN
+          - SYS_RESOURCE
           - SYS_ADMIN
 
     configMap:
