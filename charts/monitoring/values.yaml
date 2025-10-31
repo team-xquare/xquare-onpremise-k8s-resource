@@ -301,9 +301,10 @@ alloy:
           - BPF
           - SYS_PTRACE
           - NET_RAW
-          - CAP_CHECKPOINT_RESTORE
+          - CHECKPOINT_RESTORE
           - DAC_READ_SEARCH
           - PERFMON
+          - SYS_ADMIN
 
     configMap:
       create: true
