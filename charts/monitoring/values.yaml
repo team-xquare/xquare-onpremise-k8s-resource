@@ -15,7 +15,6 @@ prometheus:
         cpu: 1200m
         memory: 8Gi
     retention: "15d"
-    retentionSize: "68GB"
     global:
       scrape_interval: 30s
       scrape_timeout: 10s
@@ -23,7 +22,6 @@ prometheus:
     extraFlags:
       - web.enable-remote-write-receiver
       - web.enable-lifecycle
-      - storage.tsdb.retention.size=68GB
 
   alertmanager:
     enabled: true
