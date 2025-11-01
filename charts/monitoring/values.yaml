@@ -75,6 +75,13 @@ loki:
           kvstore:
             store: inmemory
           replication_factor: 1
+      wal:
+        enabled: true
+        flush_on_shutdown: true
+        replay_memory_ceiling: 2GB
+      chunk_idle_period: 1h
+      chunk_retain_period: 30s
+      max_chunk_age: 2h
     memberlist:
       join_members: []
     storage:
