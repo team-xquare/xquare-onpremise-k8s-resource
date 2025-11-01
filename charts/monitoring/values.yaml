@@ -66,6 +66,9 @@ loki:
     auth_enabled: false
     commonConfig:
       replication_factor: 1
+      ring:
+        kvstore:
+          store: inmemory
     memberlist:
       join_members: []
     storage:
