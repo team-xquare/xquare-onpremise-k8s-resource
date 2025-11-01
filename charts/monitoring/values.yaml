@@ -69,6 +69,12 @@ loki:
       ring:
         kvstore:
           store: inmemory
+    ingester:
+      lifecycler:
+        ring:
+          kvstore:
+            store: inmemory
+          replication_factor: 1
     memberlist:
       join_members: []
     storage:
