@@ -29,6 +29,11 @@ grafana:
               datasourceUid: prom
             serviceMap:
               datasourceUid: prom
+        - name: Pyroscope
+          uid: pyroscope
+          type: grafana-pyroscope-datasource
+          url: http://{{ .Release.Name }}-pyroscope:4040
+          isDefault: false
 
 loki:
   enabled: true
@@ -98,3 +103,95 @@ tempo:
 
 grafana-oncall:
   enabled: false
+
+pyroscope:
+  enabled: true
+
+  pyroscope:
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+
+k8s-monitoring:
+  enabled: true
+
+  cluster:
+    name: xquare-onpremise
+
+  destinations:
+    - name: mimir
+      type: prometheus
+      url: http://monitoring-mimir-nginx/prometheus/api/v1/push
+    - name: loki
+      type: loki
+      url: http://monitoring-loki-gateway/loki/api/v1/push
+    - name: tempo
+      type: otlp
+      url: http://monitoring-tempo-distributor:4317
+    - name: pyroscope
+      type: pyroscope
+      url: http://monitoring-pyroscope:4040
+
+  # Metrics collection
+  clusterMetrics:
+    enabled: true
+  annotationAutodiscovery:
+    enabled: true
+  prometheusOperatorObjects:
+    enabled: true
+
+  # Logs collection
+  clusterEvents:
+    enabled: true
+  podLogs:
+    enabled: true
+  nodeLogs:
+    enabled: false # Requires privileged access
+
+  # Traces & Profiling
+  applicationObservability:
+    enabled: true
+    receivers:
+      otlp:
+        grpc:
+          enabled: true
+        http:
+          enabled: true
+  profiling:
+    enabled: true
+  profilesReceiver:
+    enabled: true
+
+  # Auto-instrumentation (optional, heavy)
+  autoInstrumentation:
+    enabled: false
+
+  # Required collectors
+  alloy-metrics:
+    enabled: true
+  alloy-logs:
+    enabled: true
+  alloy-singleton:
+    enabled: true
+  alloy-receiver:
+    enabled: true
+    alloy:
+      extraPorts:
+        - name: otlp-grpc
+          port: 4317
+          targetPort: 4317
+          protocol: TCP
+        - name: otlp-http
+          port: 4318
+          targetPort: 4318
+          protocol: TCP
+        - name: profiles
+          port: 4040
+          targetPort: 4040
+          protocol: TCP
+  alloy-profiles:
+    enabled: true
