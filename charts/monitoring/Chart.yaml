@@ -1,32 +1,37 @@
 apiVersion: v2
 name: monitoring
-description: Unified observability stack with Prometheus, Loki, Tempo, Grafana, and Alloy
+description: Unified observability stack with Loki, Mimir, Tempo, Grafana (based on lgtm-distributed)
 type: application
-version: 1.0.0
-appVersion: "1.0.0"
+version: 2.0.0
+appVersion: "2.0.0"
 
 dependencies:
-  - name: prometheus
-    version: "27.42.0"
-    repository: https://prometheus-community.github.io/helm-charts
-    condition: prometheus.enabled
+  - name: grafana
+    alias: grafana
+    condition: grafana.enabled
+    repository: https://grafana.github.io/helm-charts
+    version: "10.1.2"
 
   - name: loki
-    version: "6.44.0"
-    repository: https://grafana.github.io/helm-charts
+    alias: loki
     condition: loki.enabled
-
-  - name: tempo
-    version: "1.24.0"
     repository: https://grafana.github.io/helm-charts
+    version: "6.44.0"
+
+  - name: mimir-distributed
+    alias: mimir
+    condition: mimir.enabled
+    repository: https://grafana.github.io/helm-charts
+    version: "5.8.0"
+
+  - name: tempo-distributed
+    alias: tempo
     condition: tempo.enabled
-
-  - name: grafana
-    version: "10.1.2"
     repository: https://grafana.github.io/helm-charts
-    condition: grafana.enabled
+    version: "1.52.2"
 
-  - name: alloy
-    version: "1.4.0"
+  - name: oncall
+    alias: grafana-oncall
+    condition: grafana-oncall.enabled
     repository: https://grafana.github.io/helm-charts
-    condition: alloy.enabled
+    version: "1.16.5"

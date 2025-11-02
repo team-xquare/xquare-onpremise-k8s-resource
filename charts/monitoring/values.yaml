@@ -1,533 +1,100 @@
-prometheus:
-  enabled: true
-
-  server:
-    name: server
-    persistentVolume:
-      enabled: true
-      size: 80Gi
-      storageClass: ""
-    resources:
-      requests:
-        cpu: 500m
-        memory: 4Gi
-      limits:
-        cpu: 1200m
-        memory: 8Gi
-    retention: "15d"
-    global:
-      scrape_interval: 30s
-      scrape_timeout: 10s
-      evaluation_interval: 30s
-    extraFlags:
-      - web.enable-remote-write-receiver
-      - web.enable-lifecycle
-
-  alertmanager:
-    enabled: true
-    persistentVolume:
-      enabled: true
-      size: 10Gi
-      storageClass: ""
-    resources:
-      requests:
-        cpu: 25m
-        memory: 80Mi
-      limits:
-        cpu: 150m
-        memory: 200Mi
-
-  kubeStateMetrics:
-    enabled: true
-    resources:
-      requests:
-        cpu: 20m
-        memory: 80Mi
-      limits:
-        cpu: 60m
-        memory: 150Mi
-
-  nodeExporter:
-    enabled: false
-
-  pushgateway:
-    enabled: false
-
-loki:
-  enabled: true
-
-  deploymentMode: SingleBinary
-
-  loki:
-    image:
-      repository: grafana/loki
-      tag: "3.3.2"
-      pullPolicy: IfNotPresent
-    auth_enabled: false
-    commonConfig:
-      replication_factor: 1
-      ring:
-        kvstore:
-          store: inmemory
-    ingester:
-      lifecycler:
-        ring:
-          kvstore:
-            store: inmemory
-          replication_factor: 1
-      wal:
-        enabled: true
-        flush_on_shutdown: true
-        replay_memory_ceiling: 2GB
-      chunk_idle_period: 1h
-      chunk_retain_period: 30s
-      max_chunk_age: 2h
-    memberlist:
-      join_members: []
-    storage:
-      type: filesystem
-    limits_config:
-      reject_old_samples: true
-      reject_old_samples_max_age: 168h
-      max_cache_freshness_per_query: 10m
-      split_queries_by_interval: 15m
-      retention_period: 15d
-    schemaConfig:
-      configs:
-        - from: 2025-01-16
-          store: tsdb
-          object_store: filesystem
-          schema: v13
-          index:
-            prefix: index_
-            period: 24h
-    resources:
-      requests:
-        cpu: 200m
-        memory: 400Mi
-      limits:
-        cpu: 600m
-        memory: 1Gi
-
-  singleBinary:
-    replicas: 1
-    persistence:
-      enabled: true
-      size: 80Gi
-      storageClass: ""
-    resources:
-      requests:
-        cpu: 200m
-        memory: 400Mi
-      limits:
-        cpu: 600m
-        memory: 1Gi
-
-  test:
-    enabled: false
-
-  monitoring:
-    selfMonitoring:
-      enabled: false
-      grafanaAgent:
-        installOperator: false
-
-  gateway:
-    enabled: false
-
-  promtail:
-    enabled: false
-
-  grafana:
-    enabled: false
-
-  read:
-    replicas: 0
-
-  write:
-    replicas: 0
-
-  backend:
-    replicas: 0
-
-  lokiCanary:
-    enabled: true
-    lokiurl: monitoring-loki:3100
-
-tempo:
-  enabled: true
-
-  tempo:
-    repository: grafana/tempo
-    tag: "2.7.2"
-    pullPolicy: IfNotPresent
-    storage:
-      trace:
-        backend: local
-        local:
-          path: /var/tempo/traces
-    receivers:
-      otlp:
-        protocols:
-          grpc:
-            endpoint: "0.0.0.0:4317"
-          http:
-            endpoint: "0.0.0.0:4318"
-      jaeger:
-        protocols:
-          thrift_http:
-            endpoint: "0.0.0.0:14268"
-          grpc:
-            endpoint: "0.0.0.0:14250"
-      zipkin:
-        endpoint: "0.0.0.0:9411"
-    resources:
-      requests:
-        cpu: 300m
-        memory: 1Gi
-      limits:
-        cpu: 1000m
-        memory: 2Gi
-
-  persistence:
-    enabled: true
-    size: 80Gi
-    storageClass: ""
-
 grafana:
   enabled: true
-
-  image:
-    repository: grafana/grafana
-    tag: "11.4.0"
-    pullPolicy: IfNotPresent
-
-  persistence:
-    enabled: true
-    size: 10Gi
-    storageClassName: ""
-
-  resources:
-    requests:
-      cpu: 100m
-      memory: 300Mi
-    limits:
-      cpu: 300m
-      memory: 600Mi
-
-  service:
-    type: ClusterIP
-    port: 80
-
-  grafana.ini:
-    server:
-      root_url: "https://grafana-xquare-infra.dsmhs.kr"
-      serve_from_sub_path: false
-    auth:
-      disable_login_form: true
-    auth.anonymous:
-      enabled: true
-      org_name: Main Org.
-      org_role: Admin
-    analytics:
-      reporting_enabled: false
-      check_for_updates: false
 
   datasources:
     datasources.yaml:
       apiVersion: 1
       datasources:
-        - name: Prometheus
-          type: prometheus
-          access: proxy
-          url: http://monitoring-prometheus-server:80
-          isDefault: true
-          editable: false
-          jsonData:
-            timeInterval: 30s
         - name: Loki
+          uid: loki
           type: loki
-          access: proxy
-          url: http://monitoring-loki:3100
-          editable: false
-          jsonData:
-            maxLines: 1000
+          url: http://{{ .Release.Name }}-loki-gateway
+          isDefault: false
+        - name: Mimir
+          uid: prom
+          type: prometheus
+          url: http://{{ .Release.Name }}-mimir-nginx/prometheus
+          isDefault: true
         - name: Tempo
+          uid: tempo
           type: tempo
-          access: proxy
-          url: http://monitoring-tempo:3200
-          editable: false
+          url: http://{{ .Release.Name }}-tempo-query-frontend:3200
+          isDefault: false
           jsonData:
-            httpMethod: GET
-            tracesToLogs:
-              datasourceUid: Loki
-              tags: ["job", "instance", "pod", "namespace"]
-              mappedTags: [{ key: "service.name", value: "service" }]
-              mapTagNamesEnabled: false
-              spanStartTimeShift: "-1h"
-              spanEndTimeShift: "1h"
-              filterByTraceID: false
-              filterBySpanID: false
+            tracesToLogsV2:
+              datasourceUid: loki
+            lokiSearch:
+              datasourceUid: loki
             tracesToMetrics:
-              datasourceUid: Prometheus
-              tags: [{ key: "service.name", value: "service" }, { key: "job" }]
-              spanStartTimeShift: "-1h"
-              spanEndTimeShift: "1h"
+              datasourceUid: prom
             serviceMap:
-              datasourceUid: Prometheus
-            nodeGraph:
-              enabled: true
+              datasourceUid: prom
 
-  adminUser: admin
-  adminPassword: admin
-
-alloy:
+loki:
   enabled: true
 
-  alloy:
-    mode: daemonset
-
-    image:
-      repository: grafana/alloy
-      tag: v1.5.1
-      pullPolicy: IfNotPresent
-
+mimir:
+  enabled: true
+  alertmanager:
     resources:
       requests:
-        cpu: 200m
-        memory: 300Mi
-      limits:
-        cpu: 500m
-        memory: 800Mi
+        cpu: 20m
+  compactor:
+    resources:
+      requests:
+        cpu: 20m
+  distributor:
+    resources:
+      requests:
+        cpu: 20m
+  ingester:
+    replicas: 2
+    zoneAwareReplication:
+      enabled: false
+    resources:
+      requests:
+        cpu: 20m
+  overrides_exporter:
+    resources:
+      requests:
+        cpu: 20m
+  querier:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 20m
+  query_frontend:
+    resources:
+      requests:
+        cpu: 20m
+  query_scheduler:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 20m
+  ruler:
+    resources:
+      requests:
+        cpu: 20m
+  store_gateway:
+    zoneAwareReplication:
+      enabled: false
+    resources:
+      requests:
+        cpu: 20m
+  minio:
+    resources:
+      requests:
+        cpu: 20m
+  rollout_operator:
+    resources:
+      requests:
+        cpu: 20m
 
-    tolerations:
-      - operator: Exists
-        effect: NoSchedule
-      - operator: Exists
-        effect: NoExecute
+tempo:
+  enabled: true
+  ingester:
+    replicas: 1
 
-    hostPID: true
-
-    securityContext:
-      privileged: false
-      runAsUser: 0
-      runAsGroup: 0
-      capabilities:
-        add:
-          - BPF
-          - SYS_PTRACE
-          - NET_RAW
-          - CHECKPOINT_RESTORE
-          - DAC_READ_SEARCH
-          - PERFMON
-          - NET_ADMIN
-          - SYS_RESOURCE
-          - SYS_ADMIN
-
-    configMap:
-      create: true
-      content: |-
-        // ============================================================================
-        // Remote Write Endpoints
-        // ============================================================================
-
-        prometheus.remote_write "default" {
-          endpoint {
-            url = "http://monitoring-prometheus-server:80/api/v1/write"
-            queue_config {
-              capacity             = 10000
-              max_shards           = 10
-              min_shards           = 1
-              max_samples_per_send = 5000
-              batch_send_deadline  = "5s"
-              min_backoff          = "30ms"
-              max_backoff          = "5s"
-            }
-          }
-        }
-
-        loki.write "default" {
-          endpoint {
-            url = "http://monitoring-loki:3100/loki/api/v1/push"
-          }
-        }
-
-        otelcol.exporter.otlp "tempo" {
-          client {
-            endpoint = "monitoring-tempo:4317"
-            tls {
-              insecure = true
-            }
-          }
-        }
-
-        // ============================================================================
-        // Kubernetes Discovery
-        // ============================================================================
-
-        discovery.kubernetes "pods" {
-          role = "pod"
-        }
-
-        discovery.kubernetes "nodes" {
-          role = "node"
-        }
-
-        // ============================================================================
-        // Metrics Collection - Node Exporter
-        // ============================================================================
-
-        prometheus.exporter.unix "node" {
-          include_exporter_metrics = true
-          filesystem {
-            mount_points_exclude = "^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)"
-            fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
-          }
-        }
-
-        prometheus.scrape "node_exporter" {
-          targets         = prometheus.exporter.unix.node.targets
-          forward_to      = [prometheus.remote_write.default.receiver]
-          scrape_interval = "30s"
-        }
-
-        // ============================================================================
-        // Metrics Collection - Kubernetes Components
-        // ============================================================================
-
-        prometheus.scrape "kubelet" {
-          targets               = discovery.kubernetes.nodes.targets
-          scheme                = "https"
-          bearer_token_file     = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-          metrics_path          = "/metrics"
-          scrape_interval       = "30s"
-          forward_to            = [prometheus.remote_write.default.receiver]
-          tls_config {
-            ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-            insecure_skip_verify = false
-          }
-        }
-
-        prometheus.scrape "kubelet_cadvisor" {
-          targets               = discovery.kubernetes.nodes.targets
-          scheme                = "https"
-          bearer_token_file     = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-          metrics_path          = "/metrics/cadvisor"
-          scrape_interval       = "30s"
-          forward_to            = [prometheus.remote_write.default.receiver]
-          tls_config {
-            ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-            insecure_skip_verify = false
-          }
-        }
-
-        prometheus.scrape "kube_apiserver" {
-          targets = [{
-            __address__ = "kubernetes.default.svc.cluster.local:443",
-          }]
-          scheme                = "https"
-          bearer_token_file     = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-          metrics_path          = "/metrics"
-          scrape_interval       = "30s"
-          forward_to            = [prometheus.remote_write.default.receiver]
-          tls_config {
-            ca_file              = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-            insecure_skip_verify = false
-          }
-        }
-
-        // ============================================================================
-        // Logs Collection
-        // ============================================================================
-
-        discovery.relabel "pod_logs" {
-          targets = discovery.kubernetes.pods.targets
-
-          rule {
-            source_labels = ["__meta_kubernetes_namespace"]
-            target_label  = "namespace"
-          }
-
-          rule {
-            source_labels = ["__meta_kubernetes_pod_name"]
-            target_label  = "pod"
-          }
-
-          rule {
-            source_labels = ["__meta_kubernetes_pod_container_name"]
-            target_label  = "container"
-          }
-
-          rule {
-            source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
-            target_label  = "app"
-          }
-        }
-
-        loki.source.kubernetes "pods" {
-          targets    = discovery.relabel.pod_logs.output
-          forward_to = [loki.process.pod_logs.receiver]
-        }
-
-        loki.process "pod_logs" {
-          stage.static_labels {
-            values = {
-              cluster = "xquare-onpremise",
-            }
-          }
-          forward_to = [loki.write.default.receiver]
-        }
-
-        // ============================================================================
-        // Traces Collection
-        // ============================================================================
-
-        otelcol.receiver.otlp "default" {
-          grpc {
-            endpoint = "0.0.0.0:4317"
-          }
-          http {
-            endpoint = "0.0.0.0:4318"
-          }
-          output {
-            traces = [otelcol.exporter.otlp.tempo.input]
-          }
-        }
-
-        beyla.ebpf "auto_instrument" {
-          discovery {
-            instrument {
-              open_ports = "8080-8090,3000,9090"
-            }
-          }
-
-          output {
-            traces = [otelcol.exporter.otlp.tempo.input]
-          }
-        }
-
-    mounts:
-      dockercontainers: false
-      extra:
-        - name: rootfs
-          mountPath: /host/root
-          readOnly: true
-        - name: sysfs
-          mountPath: /host/sys
-          readOnly: true
-        - name: procfs
-          mountPath: /host/proc
-          readOnly: true
-
-  controller:
-    volumes:
-      extra:
-        - name: rootfs
-          hostPath:
-            path: /
-        - name: sysfs
-          hostPath:
-            path: /sys
-        - name: procfs
-          hostPath:
-            path: /proc
+grafana-oncall:
+  enabled: false
