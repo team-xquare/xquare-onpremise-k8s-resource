@@ -32,24 +32,6 @@ grafana:
 
 loki:
   enabled: true
-  deploymentMode: SimpleScalable
-
-  loki:
-    schemaConfig:
-      configs:
-        - from: "2025-01-01"
-          store: tsdb
-          object_store: s3
-          schema: v13
-          index:
-            prefix: loki_index_
-            period: 24h
-
-  singleBinary:
-    replicas: 0
-
-  minio:
-    enabled: true
 
 mimir:
   enabled: true

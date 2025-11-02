@@ -12,11 +12,14 @@ dependencies:
     repository: https://grafana.github.io/helm-charts
     version: "10.1.2"
 
-  - name: loki
+  # NOTE: loki-distributed is deprecated and outdated (still uses Loki 2.9.x instead of 3.x)
+  # TODO: Migrate to grafana/loki chart (supports Loki 3.x with distributed mode)
+  # Using loki-distributed temporarily to avoid MinIO conflicts with Mimir
+  - name: loki-distributed
     alias: loki
     condition: loki.enabled
     repository: https://grafana.github.io/helm-charts
-    version: "6.44.0"
+    version: "0.80.5"
 
   - name: mimir-distributed
     alias: mimir
