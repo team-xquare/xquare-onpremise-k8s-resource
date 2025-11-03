@@ -38,15 +38,14 @@ grafana:
 loki:
   enabled: true
 
-  gateway:
-    nginxConfig:
-      resolver: coredns.kube-system.svc.cluster.local
+  global:
+    dnsService: coredns
 
 mimir:
   enabled: true
 
-  nginx:
-    resolver: coredns.kube-system.svc.cluster.local
+  global:
+    dnsService: coredns
 
   alertmanager:
     resources:
