@@ -146,8 +146,8 @@ k8s-monitoring:
   # Metrics collection
   clusterMetrics:
     enabled: true
-    cost:
-      enabled: false  # OpenCost disabled for on-premise
+    opencost:
+      enabled: false # OpenCost disabled for on-premise
   annotationAutodiscovery:
     enabled: true
   prometheusOperatorObjects:
