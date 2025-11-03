@@ -1,6 +1,13 @@
 grafana:
   enabled: true
 
+  grafana.ini:
+    auth:
+      disable_login_form: true
+    auth.anonymous:
+      enabled: true
+      org_role: Admin
+
   datasources:
     datasources.yaml:
       apiVersion: 1
@@ -41,11 +48,18 @@ loki:
   global:
     dnsService: coredns
 
+  loki:
+    auth_enabled: false
+
 mimir:
   enabled: true
 
   global:
     dnsService: coredns
+
+  mimir:
+    structuredConfig:
+      multitenancy_enabled: false
 
   alertmanager:
     resources:
@@ -105,6 +119,10 @@ mimir:
 
 tempo:
   enabled: true
+
+  tempo:
+    multitenancyEnabled: false
+
   ingester:
     replicas: 1
 
@@ -115,6 +133,10 @@ pyroscope:
   enabled: true
 
   pyroscope:
+    extraEnvVars:
+      - name: PYROSCOPE_AUTH_NO_AUTH
+        value: "true"
+
     resources:
       requests:
         cpu: 100m
@@ -139,53 +161,103 @@ k8s-monitoring:
     - name: tempo
       type: otlp
       url: http://monitoring-tempo-distributor:4317
+      protocol: http
+      metrics:
+        enabled: true
+      logs:
+        enabled: true
+      traces:
+        enabled: true
     - name: pyroscope
       type: pyroscope
       url: http://monitoring-pyroscope:4040
 
-  # Metrics collection
   clusterMetrics:
     enabled: true
     opencost:
-      enabled: false # OpenCost disabled for on-premise
+      enabled: false
+    kepler:
+      enabled: true
   annotationAutodiscovery:
     enabled: true
   prometheusOperatorObjects:
     enabled: true
 
-  # Logs collection
   clusterEvents:
     enabled: true
   podLogs:
     enabled: true
   nodeLogs:
-    enabled: false # Requires privileged access
+    enabled: true
 
-  # Traces & Profiling
   applicationObservability:
     enabled: true
     receivers:
       otlp:
         grpc:
           enabled: true
+          port: 4317
         http:
           enabled: true
+          port: 4318
+      zipkin:
+        enabled: true
+        port: 9411
   profiling:
     enabled: true
-  profilesReceiver:
+
+  autoInstrumentation:
     enabled: true
 
-  # Auto-instrumentation (optional, heavy)
-  autoInstrumentation:
-    enabled: false
-
-  # Required collectors
   alloy-metrics:
     enabled: true
-  alloy-logs:
-    enabled: true
+    alloy:
+      extraEnv:
+        - name: CLUSTER_NAME
+          value: xquare-onpremise
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+
   alloy-singleton:
     enabled: true
+    alloy:
+      extraEnv:
+        - name: CLUSTER_NAME
+          value: xquare-onpremise
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+
+  alloy-logs:
+    enabled: true
+    alloy:
+      extraEnv:
+        - name: CLUSTER_NAME
+          value: xquare-onpremise
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+
   alloy-receiver:
     enabled: true
     alloy:
@@ -198,9 +270,41 @@ k8s-monitoring:
           port: 4318
           targetPort: 4318
           protocol: TCP
-        - name: profiles
-          port: 4040
-          targetPort: 4040
+        - name: zipkin
+          port: 9411
+          targetPort: 9411
           protocol: TCP
+      extraEnv:
+        - name: CLUSTER_NAME
+          value: xquare-onpremise
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+
   alloy-profiles:
     enabled: true
+    alloy:
+      extraEnv:
+        - name: CLUSTER_NAME
+          value: xquare-onpremise
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
