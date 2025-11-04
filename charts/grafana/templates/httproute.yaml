@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: {{ .Release.Name }}-grafana
+  name: grafana
   namespace: {{ .Release.Namespace }}
 spec:
   parentRefs:
@@ -19,5 +19,5 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: {{ .Release.Name }}-grafana
+        - name: grafana
           port: 80
