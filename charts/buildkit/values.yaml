@@ -1,6 +1,6 @@
 image:
   repository: moby/buildkit
-  tag: v0.18.2-rootless
+  tag: v0.25.2
   pullPolicy: IfNotPresent
 
 namespace: buildkit
@@ -27,15 +27,10 @@ storage:
     storageClass: longhorn
     size: 50Gi
 
-podSecurityContext:
-  runAsUser: 1000
-  runAsGroup: 1000
-  fsGroup: 1000
-  runAsNonRoot: true
+podSecurityContext: {}
 
 securityContext:
-  seccompProfile:
-    type: RuntimeDefault
+  privileged: true
 
 resources:
   limits:

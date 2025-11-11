@@ -3,4 +3,4 @@ name: buildkit
 description: BuildKit daemon chart for Kubernetes
 type: application
 version: 1.0.0
-appVersion: "v0.18.2"
+appVersion: "v0.25.2"
