@@ -19,8 +19,6 @@ service:
 buildkit:
   debug: false
   rootDir: /var/lib/buildkit
-  containerdSocket: /run/containerd/containerd.sock
-  registryMirror: ""
   extraArgs: []
 
 storage:
@@ -49,6 +47,3 @@ serviceAccount:
   create: true
   name: buildkit
   annotations: {}
-
-networkPolicy:
-  enabled: false
