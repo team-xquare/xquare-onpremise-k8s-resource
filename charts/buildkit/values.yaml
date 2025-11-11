@@ -1,12 +1,13 @@
 image:
   repository: moby/buildkit
-  tag: v0.18.2
+  tag: v0.18.2-rootless
   pullPolicy: IfNotPresent
 
 namespace: buildkit
 
-daemonset:
-  enabled: true
+replicas: 1
+
+deployment:
   nodeSelector: {}
   tolerations: []
   affinity: {}
@@ -31,11 +32,12 @@ storage:
     size: 50Gi
 
 securityContext:
-  privileged: true
-  capabilities:
-    add:
-      - CAP_SYS_ADMIN
-      - CAP_SYS_RESOURCE
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
 
 resources:
   limits:

@@ -1,12 +1,12 @@
-{{- if .Values.daemonset.enabled -}}
 apiVersion: apps/v1
-kind: DaemonSet
+kind: Deployment
 metadata:
   name: buildkit
   namespace: {{ .Values.namespace }}
   labels:
     app: buildkit
 spec:
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: buildkit
@@ -16,15 +16,15 @@ spec:
         app: buildkit
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
-      {{- with .Values.daemonset.nodeSelector }}
+      {{- with .Values.deployment.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.daemonset.affinity }}
+      {{- with .Values.deployment.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.daemonset.tolerations }}
+      {{- with .Values.deployment.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -34,7 +34,7 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         args:
         - --addr
-        - unix:///run/buildkit/buildkitd.sock
+        - unix:///run/user/1000/buildkit/buildkitd.sock
         - --addr
         - tcp://0.0.0.0:1234
         {{- if .Values.buildkit.debug }}
@@ -48,21 +48,10 @@ spec:
           name: buildkit
           protocol: TCP
         securityContext:
-          privileged: {{ .Values.securityContext.privileged }}
-          {{- with .Values.securityContext.capabilities }}
-          capabilities:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+          {{- toYaml .Values.securityContext | nindent 10 }}
         volumeMounts:
         - name: buildkit-state
           mountPath: {{ .Values.buildkit.rootDir }}
-        - name: buildkit-run
-          mountPath: /run/buildkit
-        {{- if .Values.buildkit.containerdSocket }}
-        - name: containerd-socket
-          mountPath: /run/containerd
-          readOnly: true
-        {{- end }}
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
         livenessProbe:
@@ -88,19 +77,8 @@ spec:
         persistentVolumeClaim:
           claimName: buildkit-pvc
         {{- else }}
-        hostPath:
-          path: {{ .Values.storage.hostPath }}
-          type: DirectoryOrCreate
+        emptyDir: {}
         {{- end }}
         {{- else }}
         emptyDir: {}
         {{- end }}
-      - name: buildkit-run
-        emptyDir: {}
-      {{- if .Values.buildkit.containerdSocket }}
-      - name: containerd-socket
-        hostPath:
-          path: /run/containerd
-          type: Directory
-      {{- end }}
-{{- end }}
