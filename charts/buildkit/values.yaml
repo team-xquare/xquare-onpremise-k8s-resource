@@ -27,11 +27,13 @@ storage:
     storageClass: longhorn
     size: 50Gi
 
-securityContext:
+podSecurityContext:
   runAsUser: 1000
   runAsGroup: 1000
   fsGroup: 1000
   runAsNonRoot: true
+
+securityContext:
   seccompProfile:
     type: RuntimeDefault
 
