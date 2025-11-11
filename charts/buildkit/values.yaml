@@ -34,11 +34,10 @@ securityContext:
 
 resources:
   limits:
-    cpu: 4
-    memory: 8Gi
+    memory: 16Gi
   requests:
-    cpu: 1
-    memory: 2Gi
+    cpu: 2
+    memory: 4Gi
 
 serviceAccount:
   create: true
