@@ -1,0 +1,106 @@
+{{- if .Values.daemonset.enabled -}}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: buildkit
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: buildkit
+spec:
+  selector:
+    matchLabels:
+      app: buildkit
+  template:
+    metadata:
+      labels:
+        app: buildkit
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      {{- with .Values.daemonset.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.daemonset.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.daemonset.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: buildkitd
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+        - --addr
+        - unix:///run/buildkit/buildkitd.sock
+        - --addr
+        - tcp://0.0.0.0:1234
+        {{- if .Values.buildkit.debug }}
+        - --debug
+        {{- end }}
+        {{- range .Values.buildkit.extraArgs }}
+        - {{ . }}
+        {{- end }}
+        ports:
+        - containerPort: 1234
+          name: buildkit
+          protocol: TCP
+        securityContext:
+          privileged: {{ .Values.securityContext.privileged }}
+          {{- with .Values.securityContext.capabilities }}
+          capabilities:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        volumeMounts:
+        - name: buildkit-state
+          mountPath: {{ .Values.buildkit.rootDir }}
+        - name: buildkit-run
+          mountPath: /run/buildkit
+        {{- if .Values.buildkit.containerdSocket }}
+        - name: containerd-socket
+          mountPath: /run/containerd
+          readOnly: true
+        {{- end }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        livenessProbe:
+          exec:
+            command:
+            - buildctl
+            - debug
+            - workers
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          exec:
+            command:
+            - buildctl
+            - debug
+            - workers
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      volumes:
+      - name: buildkit-state
+        {{- if .Values.storage.enabled }}
+        {{- if .Values.storage.pvc.enabled }}
+        persistentVolumeClaim:
+          claimName: buildkit-pvc
+        {{- else }}
+        hostPath:
+          path: {{ .Values.storage.hostPath }}
+          type: DirectoryOrCreate
+        {{- end }}
+        {{- else }}
+        emptyDir: {}
+        {{- end }}
+      - name: buildkit-run
+        emptyDir: {}
+      {{- if .Values.buildkit.containerdSocket }}
+      - name: containerd-socket
+        hostPath:
+          path: /run/containerd
+          type: Directory
+      {{- end }}
+{{- end }}

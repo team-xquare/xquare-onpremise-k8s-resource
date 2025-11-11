@@ -1,0 +1,54 @@
+image:
+  repository: moby/buildkit
+  tag: v0.18.2
+  pullPolicy: IfNotPresent
+
+namespace: buildkit
+
+daemonset:
+  enabled: true
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+service:
+  type: ClusterIP
+  port: 1234
+
+buildkit:
+  debug: false
+  rootDir: /var/lib/buildkit
+  containerdSocket: /run/containerd/containerd.sock
+  registryMirror: ""
+  extraArgs: []
+
+storage:
+  enabled: true
+  hostPath: /var/lib/buildkit
+  pvc:
+    enabled: false
+    storageClass: ""
+    size: 50Gi
+
+securityContext:
+  privileged: true
+  capabilities:
+    add:
+      - CAP_SYS_ADMIN
+      - CAP_SYS_RESOURCE
+
+resources:
+  limits:
+    cpu: 4
+    memory: 8Gi
+  requests:
+    cpu: 1
+    memory: 2Gi
+
+serviceAccount:
+  create: true
+  name: buildkit
+  annotations: {}
+
+networkPolicy:
+  enabled: false
