@@ -24,11 +24,9 @@ buildkit:
   extraArgs: []
 
 storage:
-  enabled: true
-  hostPath: /var/lib/buildkit
   pvc:
-    enabled: false
-    storageClass: ""
+    enabled: true
+    storageClass: longhorn
     size: 50Gi
 
 securityContext:

@@ -72,13 +72,9 @@ spec:
           periodSeconds: 10
       volumes:
       - name: buildkit-state
-        {{- if .Values.storage.enabled }}
         {{- if .Values.storage.pvc.enabled }}
         persistentVolumeClaim:
           claimName: buildkit-pvc
-        {{- else }}
-        emptyDir: {}
-        {{- end }}
         {{- else }}
         emptyDir: {}
         {{- end }}

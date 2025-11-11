@@ -1,0 +1,18 @@
+{{- if .Values.storage.pvc.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: buildkit-pvc
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: buildkit
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- if .Values.storage.pvc.storageClass }}
+  storageClassName: {{ .Values.storage.pvc.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.pvc.size }}
+{{- end }}
