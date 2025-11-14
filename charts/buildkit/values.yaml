@@ -19,7 +19,9 @@ service:
 buildkit:
   debug: false
   rootDir: /var/lib/buildkit
-  extraArgs: []
+  extraArgs:
+    - --gc-keepstorage=150000
+    - --gc-policy=keepBytes=150000000000,keepDuration=720h,filters=type==source.local;type==exec.cachemount;type==source.git.checkout
 
 storage:
   pvc:
