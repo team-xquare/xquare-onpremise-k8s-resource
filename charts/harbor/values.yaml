@@ -6,7 +6,8 @@ harbor:
 
   externalURL: "https://harbor-xquare-infra.dsmhs.kr:443"
 
-  harborAdminPassword: <path:avp/data/harbor/#harborAdminPassword>
+  existingSecretAdminPassword: "harbor-admin-password"
+  existingSecretAdminPasswordKey: HARBOR_ADMIN_PASSWORD
 
   registry:
     relativeurls: true
