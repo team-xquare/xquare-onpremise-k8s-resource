@@ -1,0 +1,11 @@
+apiVersion: v2
+name: signoz
+description: SigNoz - Open-source observability platform
+type: application
+version: 1.0.0
+appVersion: "0.102.1"
+
+dependencies:
+  - name: signoz
+    repository: https://charts.signoz.io
+    version: "0.102.1"
