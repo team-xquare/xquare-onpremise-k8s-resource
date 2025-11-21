@@ -19,5 +19,5 @@ spec:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: signoz-frontend
-          port: 3301
+        - name: signoz
+          port: 8080
