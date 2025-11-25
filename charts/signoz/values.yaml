@@ -1,29 +1,3 @@
 signoz:
   global:
     storageClass: longhorn
-
-  clickhouse:
-    installCustomStorageClass: true
-    persistence:
-      size: 50Gi
-
-  # SigNoz Frontend service configuration
-  frontend:
-    service:
-      type: ClusterIP
-      port: 3301
-
-  # Query Service configuration
-  queryService:
-    service:
-      type: ClusterIP
-      port: 8080
-
-  # OTel Collector configuration
-  otelCollector:
-    service:
-      type: ClusterIP
-
-  # Retention period configuration
-  # Default: 7 days for logs and traces, 30 days for metrics
-  # Can be changed in SigNoz UI Settings > General tab
