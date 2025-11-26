@@ -1,0 +1,31 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAuth
+metadata:
+  name: victoria-auth
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicaCount: 2
+
+  # Select all VMUser resources by default
+  selectAllByDefault: true
+
+  # Optional: Namespace selector for VMUser resources
+  userNamespaceSelector: {}
+
+  # Optional: Label selector for VMUser resources
+  userSelector: {}
+
+  # Optional: Allow unauthorized access to certain paths
+  # unauthorizedAccessConfig:
+  #   - src_paths:
+  #       - "/metrics"
+  #     url_prefix:
+  #       - "http://vmstorage:8482"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

@@ -1,0 +1,24 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VTSingle
+metadata:
+  name: victoria-traces
+  namespace: {{ .Release.Namespace }}
+spec:
+  retentionPeriod: "7d"
+  removePvcAfterDelete: true
+
+  storage:
+    storageClassName: longhorn
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 50Gi
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 500Mi
+    limits:
+      cpu: 2
+      memory: 4Gi
