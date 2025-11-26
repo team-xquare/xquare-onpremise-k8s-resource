@@ -1,8 +1,0 @@
-signoz:
-  global:
-    storageClass: longhorn
-
-  clickhouse:
-    installCustomStorageClass: true
-    persistence:
-      size: 50Gi
