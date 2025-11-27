@@ -132,13 +132,13 @@ spec:
         tls:
           insecure: true
 
-      # VictoriaLogs (로그)
+      # VictoriaLogs (로그) - 기본 AccountID=0, ProjectID=0
       otlphttp/vl:
         endpoint: http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428/insert/opentelemetry
         tls:
           insecure: true
 
-      # VictoriaTraces (트레이스)
+      # VictoriaTraces (트레이스) - 기본 AccountID=0, ProjectID=0
       otlphttp/vt:
         endpoint: http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428/insert/opentelemetry
         tls:
