@@ -16,7 +16,6 @@ spec:
       admin_password: admin
     plugins:
       plugin_admin_enabled: "true"
-      allow_loading_unsigned_plugins: "victorialogs-datasource"
 
   deployment:
     spec:
@@ -28,7 +27,7 @@ spec:
             image: grafana/grafana:11.4.0
             env:
             - name: GF_INSTALL_PLUGINS
-              value: "https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/v0.8.0/victorialogs-datasource-v0.8.0.zip;victorialogs-datasource"
+              value: "victoriametrics-logs-datasource"
             resources:
               requests:
                 cpu: 100m
