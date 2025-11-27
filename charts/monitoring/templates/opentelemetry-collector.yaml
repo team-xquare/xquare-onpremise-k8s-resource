@@ -128,7 +128,7 @@ spec:
     exporters:
       # VictoriaMetrics (메트릭)
       otlphttp/vm:
-        endpoint: http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/0/opentelemetry
+        endpoint: http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/multitenant/opentelemetry
         tls:
           insecure: true
 
