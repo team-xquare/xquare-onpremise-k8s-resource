@@ -9,21 +9,6 @@ spec:
 
   serviceAccount: otel-collector
 
-  volumeMounts:
-  - name: varlogpods
-    mountPath: /var/log/pods
-    readOnly: true
-  - name: varlibdockercontainers
-    mountPath: /var/lib/docker/containers
-    readOnly: true
-
-  volumes:
-  - name: varlogpods
-    hostPath:
-      path: /var/log/pods
-  - name: varlibdockercontainers
-    hostPath:
-      path: /var/lib/docker/containers
 
   env:
   - name: K8S_NODE_NAME
@@ -41,24 +26,6 @@ spec:
 
   config:
     receivers:
-      # 로그 수집
-      filelog:
-        include: [/var/log/pods/*/*/*.log]
-        exclude: [/var/log/pods/{{ .Release.Namespace }}_otel-collector*/*.log]
-        start_at: end
-        include_file_path: true
-        include_file_name: false
-        operators:
-        - type: container
-          id: container-parser
-
-      # 트레이스 수집
-      otlp:
-        protocols:
-          grpc:
-            endpoint: 0.0.0.0:4317
-          http:
-            endpoint: 0.0.0.0:4318
 
       # Kubelet 메트릭
       kubeletstats:
@@ -103,17 +70,11 @@ spec:
         - sources:
           - from: connection
 
-      # Tenant ID 변환 (멀티테넌시)
+      # vm_account_id 레이블 추가 (VictoriaMetrics 멀티테넌시)
       resource:
         attributes:
         - key: vm_account_id
           from_attribute: tenant_id
-          action: insert
-        - key: AccountID
-          from_attribute: tenant_id
-          action: insert
-        - key: ProjectID
-          value: "0"
           action: insert
 
       batch:
@@ -126,37 +87,15 @@ spec:
         spike_limit_percentage: 25
 
     exporters:
-      # VictoriaMetrics (메트릭)
+      # VictoriaMetrics (메트릭) - multitenant endpoint
       otlphttp/vm:
         endpoint: http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/multitenant/opentelemetry
-        tls:
-          insecure: true
-
-      # VictoriaLogs (로그) - 기본 AccountID=0, ProjectID=0
-      otlphttp/vl:
-        endpoint: http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428/insert/opentelemetry
-        tls:
-          insecure: true
-
-      # VictoriaTraces (트레이스) - 기본 AccountID=0, ProjectID=0
-      otlphttp/vt:
-        endpoint: http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428/insert/opentelemetry
         tls:
           insecure: true
 
     service:
       pipelines:
         metrics:
-          receivers: [otlp, kubeletstats, k8s_cluster]
+          receivers: [kubeletstats, k8s_cluster]
           processors: [k8sattributes, resource, memory_limiter, batch]
           exporters: [otlphttp/vm]
-
-        logs:
-          receivers: [filelog, otlp]
-          processors: [k8sattributes, resource, memory_limiter, batch]
-          exporters: [otlphttp/vl]
-
-        traces:
-          receivers: [otlp]
-          processors: [k8sattributes, resource, memory_limiter, batch]
-          exporters: [otlphttp/vt]

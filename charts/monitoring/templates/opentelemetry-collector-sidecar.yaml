@@ -1,0 +1,89 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-sidecar
+  namespace: {{ .Release.Namespace }}
+spec:
+  mode: sidecar
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+            include_metadata: true
+          http:
+            endpoint: 0.0.0.0:4318
+            include_metadata: true
+
+    processors:
+      batch:
+        timeout: 10s
+        send_batch_size: 1024
+        metadata_keys:
+        - X-Tenant-ID
+
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 80
+        spike_limit_percentage: 25
+
+    extensions:
+      headers_setter:
+        headers:
+        - action: upsert
+          key: AccountID
+          from_context: X-Tenant-ID
+        - action: upsert
+          key: ProjectID
+          value: "0"
+
+    exporters:
+      # VictoriaMetrics (메트릭) - multitenant endpoint with label-based multitenancy
+      otlphttp/vm:
+        endpoint: http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/multitenant/opentelemetry
+        tls:
+          insecure: true
+
+      # VictoriaLogs (로그) - header-based multitenancy
+      otlphttp/vl:
+        endpoint: http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428/insert/opentelemetry
+        auth:
+          authenticator: headers_setter
+        tls:
+          insecure: true
+
+      # VictoriaTraces (트레이스) - header-based multitenancy
+      otlphttp/vt:
+        endpoint: http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428/insert/opentelemetry
+        auth:
+          authenticator: headers_setter
+        tls:
+          insecure: true
+
+    service:
+      extensions: [headers_setter]
+      pipelines:
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/vm]
+
+        logs:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/vl]
+
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/vt]
