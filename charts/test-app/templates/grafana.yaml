@@ -37,8 +37,6 @@ spec:
                 memory: 1Gi
 
   service:
-    metadata:
-      name: grafana
     spec:
       type: NodePort
       ports:
