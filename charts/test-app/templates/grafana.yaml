@@ -16,6 +16,7 @@ spec:
       admin_password: admin
     plugins:
       plugin_admin_enabled: "true"
+      allow_loading_unsigned_plugins: "victorialogs-datasource"
 
   deployment:
     spec:
