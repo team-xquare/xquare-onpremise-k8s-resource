@@ -134,7 +134,7 @@ spec:
 
       # VictoriaLogs (로그)
       otlphttp/vl:
-        endpoint: http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428
+        endpoint: http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428/insert/opentelemetry
         tls:
           insecure: true
 
