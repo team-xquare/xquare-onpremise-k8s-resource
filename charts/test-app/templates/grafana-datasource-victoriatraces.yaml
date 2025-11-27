@@ -7,13 +7,24 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: "grafana"
+  valuesFrom:
+    - targetPath: basicAuthUser
+      valueFrom:
+        secretKeyRef:
+          name: grafana-datasource-credentials
+          key: username
+    - targetPath: secureJsonData.basicAuthPassword
+      valueFrom:
+        secretKeyRef:
+          name: grafana-datasource-credentials
+          key: password
   datasource:
     name: VictoriaTraces
     type: jaeger
     access: proxy
     url: http://vmauth-victoria-auth.monitoring.svc:8427/jaeger
     editable: true
-    secureJsonData:
-      basicAuthUser: tenant-{{ .Values.tenantId }}
-      basicAuthPassword: tenant-{{ .Values.tenantId }}-password
     basicAuth: true
+    basicAuthUser: ${USERNAME}
+    secureJsonData:
+      basicAuthPassword: ${PASSWORD}
