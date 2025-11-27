@@ -128,7 +128,7 @@ spec:
     exporters:
       # VictoriaMetrics (메트릭)
       otlphttp/vm:
-        endpoint: http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480
+        endpoint: http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/0/opentelemetry
         tls:
           insecure: true
 
@@ -140,7 +140,7 @@ spec:
 
       # VictoriaTraces (트레이스)
       otlphttp/vt:
-        endpoint: http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428
+        endpoint: http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428/insert/opentelemetry
         tls:
           insecure: true
 
