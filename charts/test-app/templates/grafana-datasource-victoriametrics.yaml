@@ -26,9 +26,6 @@ spec:
     isDefault: true
     editable: true
     basicAuth: true
-    basicAuthUser: ${USERNAME}
     jsonData:
       httpMethod: POST
       timeInterval: "30s"
-    secureJsonData:
-      basicAuthPassword: ${PASSWORD}

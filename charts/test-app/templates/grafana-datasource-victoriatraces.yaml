@@ -25,6 +25,3 @@ spec:
     url: http://vmauth-victoria-auth.monitoring.svc:8427/jaeger
     editable: true
     basicAuth: true
-    basicAuthUser: ${USERNAME}
-    secureJsonData:
-      basicAuthPassword: ${PASSWORD}
