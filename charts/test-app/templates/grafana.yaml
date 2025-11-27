@@ -1,0 +1,48 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: Grafana
+metadata:
+  name: grafana
+  namespace: {{ .Release.Namespace }}
+  labels:
+    dashboards: "grafana"
+spec:
+  config:
+    log:
+      mode: "console"
+    auth:
+      disable_login_form: "false"
+    security:
+      admin_user: admin
+      admin_password: admin
+    plugins:
+      plugin_admin_enabled: "true"
+
+  deployment:
+    spec:
+      replicas: 1
+      template:
+        spec:
+          containers:
+          - name: grafana
+            image: grafana/grafana:11.4.0
+            env:
+            - name: GF_INSTALL_PLUGINS
+              value: "https://github.com/VictoriaMetrics/victorialogs-datasource/releases/download/v0.8.0/victorialogs-datasource-v0.8.0.zip;victorialogs-datasource"
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 1Gi
+
+  service:
+    metadata:
+      name: grafana
+    spec:
+      type: NodePort
+      ports:
+      - name: grafana
+        port: 3000
+        protocol: TCP
+        targetPort: 3000
