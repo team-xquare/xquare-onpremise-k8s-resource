@@ -1,0 +1,162 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-collector
+  namespace: {{ .Release.Namespace }}
+spec:
+  mode: daemonset
+  image: otel/opentelemetry-collector-contrib:0.139.0
+
+  serviceAccount: otel-collector
+
+  volumeMounts:
+  - name: varlogpods
+    mountPath: /var/log/pods
+    readOnly: true
+  - name: varlibdockercontainers
+    mountPath: /var/lib/docker/containers
+    readOnly: true
+
+  volumes:
+  - name: varlogpods
+    hostPath:
+      path: /var/log/pods
+  - name: varlibdockercontainers
+    hostPath:
+      path: /var/lib/docker/containers
+
+  env:
+  - name: K8S_NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1
+      memory: 1Gi
+
+  config: |
+    receivers:
+      # 로그 수집
+      filelog:
+        include: [/var/log/pods/*/*/*.log]
+        exclude: [/var/log/pods/{{ .Release.Namespace }}_otel-collector*/*.log]
+        start_at: end
+        include_file_path: true
+        include_file_name: false
+        operators:
+        - type: container
+          id: container-parser
+
+      # 트레이스 수집
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+      # Kubelet 메트릭
+      kubeletstats:
+        collection_interval: 30s
+        auth_type: serviceAccount
+        endpoint: https://${env:K8S_NODE_NAME}:10250
+        insecure_skip_verify: true
+        metric_groups:
+        - node
+        - pod
+        - container
+        - volume
+
+      # 클러스터 메트릭
+      k8s_cluster:
+        auth_type: serviceAccount
+        collection_interval: 30s
+
+    processors:
+      # Kubernetes 메타데이터 추가
+      k8sattributes:
+        auth_type: serviceAccount
+        passthrough: false
+        extract:
+          metadata:
+          - k8s.namespace.name
+          - k8s.pod.name
+          - k8s.pod.uid
+          - k8s.deployment.name
+          - k8s.node.name
+          labels:
+          - tag_name: tenant_id
+            key: tenant-id
+            from: namespace
+        pod_association:
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.ip
+        - sources:
+          - from: resource_attribute
+            name: k8s.pod.uid
+        - sources:
+          - from: connection
+
+      # Tenant ID 변환 (멀티테넌시)
+      resource:
+        attributes:
+        - key: vm_account_id
+          from_attribute: tenant_id
+          action: insert
+        - key: AccountID
+          from_attribute: tenant_id
+          action: insert
+        - key: ProjectID
+          value: "0"
+          action: insert
+
+      batch:
+        timeout: 10s
+        send_batch_size: 1024
+
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 80
+        spike_limit_percentage: 25
+
+    exporters:
+      # VictoriaMetrics (메트릭)
+      otlphttp/vm:
+        endpoint: http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480
+        tls:
+          insecure: true
+
+      # VictoriaLogs (로그)
+      otlphttp/vl:
+        endpoint: http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428
+        tls:
+          insecure: true
+
+      # VictoriaTraces (트레이스)
+      otlphttp/vt:
+        endpoint: http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428
+        tls:
+          insecure: true
+
+    service:
+      pipelines:
+        metrics:
+          receivers: [otlp, kubeletstats, k8s_cluster]
+          processors: [k8sattributes, resource, memory_limiter, batch]
+          exporters: [otlphttp/vm]
+
+        logs:
+          receivers: [filelog, otlp]
+          processors: [k8sattributes, resource, memory_limiter, batch]
+          exporters: [otlphttp/vl]
+
+        traces:
+          receivers: [otlp]
+          processors: [k8sattributes, resource, memory_limiter, batch]
+          exporters: [otlphttp/vt]
