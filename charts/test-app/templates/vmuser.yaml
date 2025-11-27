@@ -38,18 +38,17 @@ spec:
           - "AccountID: {{ .Values.tenantId }}"
           - "ProjectID: 0"
       paths:
-        - "/select/.*"
+        - "/select/logsql/.*"
         - "/insert/.*"
-        - "/.*"
 
-    # VictoriaTraces - Read/Write access
+    # VictoriaTraces - Jaeger UI & API
     - static:
         url: http://vtsingle-victoria-traces.monitoring.svc:10428
         headers:
           - "AccountID: {{ .Values.tenantId }}"
           - "ProjectID: 0"
       paths:
-        - "/select/.*"
-        - "/insert/.*"
-        - "/.*"
         - "/jaeger/.*"
+        - "/api/traces.*"
+        - "/api/services.*"
+        - "/api/operations.*"
