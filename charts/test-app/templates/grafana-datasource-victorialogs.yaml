@@ -9,7 +9,7 @@ spec:
       dashboards: "grafana"
   datasource:
     name: VictoriaLogs
-    type: victorialogs-datasource
+    type: victoriametrics-logs-datasource
     access: proxy
     url: http://vmauth-victoria-auth.monitoring.svc:8427
     editable: true
