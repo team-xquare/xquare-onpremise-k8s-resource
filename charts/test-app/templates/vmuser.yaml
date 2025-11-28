@@ -14,11 +14,10 @@ spec:
         name: victoria-metrics
         namespace: monitoring
       paths:
-        - "/select/.*"
+        - "/api/v1/.*"
         - "/prometheus/api/v1/.*"
         - "/graphite/.*"
-        - "/api/v1/.*"
-      target_path_suffix: "/select/{{ .Values.tenantId }}"
+      target_path_suffix: "/select/{{ .Values.tenantId }}/prometheus"
 
     # VictoriaMetrics - Write access (vminsert)
     - crd:
@@ -26,10 +25,9 @@ spec:
         name: victoria-metrics
         namespace: monitoring
       paths:
-        - "/insert/.*"
-        - "/prometheus/api/v1/write"
         - "/api/v1/write"
-      target_path_suffix: "/insert/{{ .Values.tenantId }}"
+        - "/prometheus/api/v1/write"
+      target_path_suffix: "/insert/{{ .Values.tenantId }}/prometheus"
 
     # VictoriaLogs - Read/Write access
     - static:
@@ -38,7 +36,7 @@ spec:
           - "AccountID: {{ .Values.tenantId }}"
           - "ProjectID: 0"
       paths:
-        - "/select/logsql/.*"
+        - "/select/.*"
         - "/insert/.*"
 
     # VictoriaTraces - Jaeger UI & API
@@ -48,7 +46,4 @@ spec:
           - "AccountID: {{ .Values.tenantId }}"
           - "ProjectID: 0"
       paths:
-        - "/jaeger/.*"
-        - "/api/traces.*"
-        - "/api/services.*"
-        - "/api/operations.*"
+        - "/select/jaeger/.*"
