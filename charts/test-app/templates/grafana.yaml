@@ -67,13 +67,18 @@ spec:
     editable: false
     jsonData:
       httpMethod: POST
-    secureJsonDataFrom:
-      basicAuthUser:
-        name: grafana-datasource-credentials
-        key: username
-      basicAuthPassword:
-        name: grafana-datasource-credentials
-        key: password
+    secureJsonData: {}
+  valuesFrom:
+    - targetPath: datasource.secureJsonData.basicAuthUser
+      valueFrom:
+        secretKeyRef:
+          name: grafana-datasource-credentials
+          key: username
+    - targetPath: datasource.secureJsonData.basicAuthPassword
+      valueFrom:
+        secretKeyRef:
+          name: grafana-datasource-credentials
+          key: password
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
@@ -91,13 +96,18 @@ spec:
     editable: false
     jsonData:
       httpMethod: POST
-    secureJsonDataFrom:
-      basicAuthUser:
-        name: grafana-datasource-credentials
-        key: username
-      basicAuthPassword:
-        name: grafana-datasource-credentials
-        key: password
+    secureJsonData: {}
+  valuesFrom:
+    - targetPath: datasource.secureJsonData.basicAuthUser
+      valueFrom:
+        secretKeyRef:
+          name: grafana-datasource-credentials
+          key: username
+    - targetPath: datasource.secureJsonData.basicAuthPassword
+      valueFrom:
+        secretKeyRef:
+          name: grafana-datasource-credentials
+          key: password
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
@@ -112,11 +122,16 @@ spec:
     url: vmauth-victoria-auth.monitoring.svc{{ .Values.tenantId }}
     basicAuth: true
     editable: false
-    secureJsonDataFrom:
-      basicAuthUser:
-        name: grafana-datasource-credentials
-        key: username
-      basicAuthPassword:
-        name: grafana-datasource-credentials
-        key: password
+    secureJsonData: {}
+  valuesFrom:
+    - targetPath: datasource.secureJsonData.basicAuthUser
+      valueFrom:
+        secretKeyRef:
+          name: grafana-datasource-credentials
+          key: username
+    - targetPath: datasource.secureJsonData.basicAuthPassword
+      valueFrom:
+        secretKeyRef:
+          name: grafana-datasource-credentials
+          key: password
 
