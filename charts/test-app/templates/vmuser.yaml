@@ -8,39 +8,41 @@ spec:
   password: tenant-1-password
 
   targetRefs:
-    # Metrics (VMCluster)
+    # Metrics (VictoriaMetrics Cluster)
     - crd:
         kind: VMCluster/vmselect
         name: victoria-metrics
         namespace: monitoring
       paths:
-        - "/vm/tenant-1/.*"
+        - "/vm/tenant-{{ .Values.tenantId }}/.*"
+        - "/vm/tenant-{{ .Values.tenantId }}/prometheus/api/v1/.*"
       headers:
-        - "AccountID: 1"
-        - "ProjectID: 1"
+        - "AccountID: {{ .Values.tenantId }}"
+        - "ProjectID: {{ .Values.tenantId }}"
       drop_src_path_prefix_parts: 2
+      targetPathSuffix: "/select/{{ .Values.tenantId }}"
 
-    # Logs (VLSingle)
+    # Logs (VictoriaLogs Single-node)
     - crd:
         kind: VLSingle
         name: victoria-logs
         namespace: monitoring
       paths:
-        - "/vl/tenant-1/.*"
+        - "/vl/tenant-{{ .Values.tenantId }}/.*"
       headers:
-        - "AccountID: 1"
-        - "ProjectID: 1"
+        - "AccountID: {{ .Values.tenantId }}"
+        - "ProjectID: {{ .Values.tenantId }}"
       drop_src_path_prefix_parts: 2
 
-    # Traces (VTSingle)
+    # Traces (VictoriaTraces Single-node)
     - crd:
         kind: VTSingle
         name: victoria-traces
         namespace: monitoring
       paths:
-        - "/vt/tenant-1/.*"
+        - "/vt/tenant-{{ .Values.tenantId }}/.*"
       headers:
-        - "AccountID: 1"
-        - "ProjectID: 1"
+        - "AccountID: {{ .Values.tenantId }}"
+        - "ProjectID: {{ .Values.tenantId }}"
       drop_src_path_prefix_parts: 2
 
