@@ -67,11 +67,12 @@ spec:
     editable: false
     jsonData:
       httpMethod: POST
-    secureJsonDataFrom:
-      basicAuthUser:
+    basicAuthUser:
+      secretKeyRef:
         name: grafana-datasource-credentials
         key: username
-      basicAuthPassword:
+    basicAuthPassword:
+      secretKeyRef:
         name: grafana-datasource-credentials
         key: password
 ---
@@ -91,11 +92,12 @@ spec:
     editable: false
     jsonData:
       httpMethod: POST
-    secureJsonDataFrom:
-      basicAuthUser:
+    basicAuthUser:
+      secretKeyRef:
         name: grafana-datasource-credentials
         key: username
-      basicAuthPassword:
+    basicAuthPassword:
+      secretKeyRef:
         name: grafana-datasource-credentials
         key: password
 ---
@@ -112,10 +114,12 @@ spec:
     url: vmauth-victoria-auth.monitoring.svc{{ .Values.tenantId }}
     basicAuth: true
     editable: false
-    secureJsonDataFrom:
-      basicAuthUser:
+    basicAuthUser:
+      secretKeyRef:
         name: grafana-datasource-credentials
         key: username
-      basicAuthPassword:
+    basicAuthPassword:
+      secretKeyRef:
         name: grafana-datasource-credentials
         key: password
+
