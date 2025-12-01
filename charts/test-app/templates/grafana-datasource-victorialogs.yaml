@@ -4,26 +4,20 @@ metadata:
   name: victorialogs
   namespace: {{ .Release.Namespace }}
 spec:
-  instanceSelector:
-    matchLabels:
-      dashboards: "grafana"
-  valuesFrom:
-    - targetPath: basicAuthUser
-      valueFrom:
-        secretKeyRef:
-          name: grafana-datasource-credentials
-          key: username
-    - targetPath: secureJsonData.basicAuthPassword
-      valueFrom:
-        secretKeyRef:
-          name: grafana-datasource-credentials
-          key: password
   datasource:
     name: VictoriaLogs
     type: victoriametrics-logs-datasource
     access: proxy
-    url: http://vmauth-victoria-auth.monitoring.svc:8427
-    editable: true
+    url: http://vmauth-victoria-auth.monitoring.svc:8427/vl/tenant-{{ .Values.tenantId }}
     basicAuth: true
+    basicAuthUser:
+      secretKeyRef:
+        name: grafana-datasource-credentials
+        key: username
+    basicAuthPassword:
+      secretKeyRef:
+        name: grafana-datasource-credentials
+        key: password
+    editable: false
     jsonData:
       httpMethod: POST
