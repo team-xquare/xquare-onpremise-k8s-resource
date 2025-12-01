@@ -1,43 +1,46 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMUser
 metadata:
-  name: tenant-{{ .Values.tenantId }}
-  namespace: {{ .Release.Namespace }}
+  name: tenant-1
+  namespace: monitoring
 spec:
-  username: tenant-{{ .Values.tenantId }}
-  password: tenant-{{ .Values.tenantId }}-password
+  username: tenant-1
+  password: tenant-1-password
 
   targetRefs:
-    # Metrics (VictoriaMetrics Cluster)
+    # Metrics (VMCluster)
     - crd:
         kind: VMCluster/vmselect
         name: victoria-metrics
         namespace: monitoring
       paths:
-        - "/vm/tenant-{{ .Values.tenantId }}/api/v1/.*"
-        - "/vm/tenant-{{ .Values.tenantId }}/prometheus/api/v1/.*"
+        - "/vm/tenant-1/.*"
       headers:
-        - "AccountID: {{ .Values.tenantId }}"
-        - "ProjectID: {{ .Values.tenantId }}"
+        - "AccountID: 1"
+        - "ProjectID: 1"
       drop_src_path_prefix_parts: 2
 
-    # Logs (VictoriaLogs Single-node)
-    - static:
-        url: http://vlsingle-victoria-logs.monitoring.svc:9428
+    # Logs (VLSingle)
+    - crd:
+        kind: VLSingle
+        name: victoria-logs
+        namespace: monitoring
       paths:
-        - "/vl/tenant-{{ .Values.tenantId }}/select/.*"
+        - "/vl/tenant-1/.*"
       headers:
-        - "AccountID: {{ .Values.tenantId }}"
-        - "ProjectID: {{ .Values.tenantId }}"
+        - "AccountID: 1"
+        - "ProjectID: 1"
       drop_src_path_prefix_parts: 2
 
-    # Traces (VictoriaTraces Single-node)
-    - static:
-        url: http://vtsingle-victoria-traces.monitoring.svc:10428
+    # Traces (VTSingle)
+    - crd:
+        kind: VTSingle
+        name: victoria-traces
+        namespace: monitoring
       paths:
-        - "/vt/tenant-{{ .Values.tenantId }}/api/traces.*"
+        - "/vt/tenant-1/.*"
       headers:
-        - "AccountID: {{ .Values.tenantId }}"
-        - "ProjectID: {{ .Values.tenantId }}"
+        - "AccountID: 1"
+        - "ProjectID: 1"
       drop_src_path_prefix_parts: 2
 
