@@ -24,6 +24,7 @@ spec:
         spec:
           containers:
             - name: grafana
+              image: docker.io/grafana/grafana:12.3.0
               env:
                 - name: GF_INSTALL_PLUGINS
                   value: "victoriametrics-logs-datasource"
@@ -63,6 +64,7 @@ spec:
     matchLabels:
       app: grafana-instance
   datasource:
+    uid: victorialogs
     name: VictoriaLogs
     type: victoriametrics-logs-datasource
     access: proxy
@@ -72,6 +74,11 @@ spec:
     editable: false
     jsonData:
       httpMethod: POST
+      derivedFields:
+        - name: TraceID
+          matcherName: trace_id
+          url: "${__value.raw}"
+          datasourceUid: victoriatraces
     secureJsonData:
       basicAuthPassword: ${password}
   valuesFrom:
@@ -96,6 +103,7 @@ spec:
     matchLabels:
       app: grafana-instance
   datasource:
+    uid: victoriametrics
     name: VictoriaMetrics
     type: prometheus
     access: proxy
@@ -130,6 +138,7 @@ spec:
     matchLabels:
       app: grafana-instance
   datasource:
+    uid: victoriatraces
     name: VictoriaTraces
     type: jaeger
     access: proxy
@@ -138,8 +147,17 @@ spec:
     basicAuthUser: ${username}
     editable: false
     jsonData:
+      # Grafana v12.2.0+에서 VictoriaLogs datasource로 Trace→Log 연동 지원
       tracesToLogsV2:
         datasourceUid: victorialogs
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        filterByTraceID: true
+        filterBySpanID: true
+        customQuery: true
+        query: 'trace_id:="$${__trace.traceId}"'
+      nodeGraph:
+        enabled: true
     secureJsonData:
       basicAuthPassword: ${password}
   valuesFrom:
@@ -153,3 +171,4 @@ spec:
         secretKeyRef:
           name: grafana-datasource-credentials
           key: password
+
