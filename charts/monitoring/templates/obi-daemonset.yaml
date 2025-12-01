@@ -3,6 +3,22 @@
 # Image: otel/ebpf-instrument:main (official OBI image)
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: obi-config
+data:
+  obi-config.yml: |
+    otel_traces_export:
+      endpoint: http://otel-collector-collector:4317
+    otel_metrics_export:
+      endpoint: http://otel-collector-collector:4317
+      features:
+        - application
+    attributes:
+      kubernetes:
+        enable: true
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: obi
@@ -61,21 +77,19 @@ spec:
           securityContext:
             privileged: true
           env:
-            # Traces export to OTel Collector (gRPC)
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://otel-collector-collector:4317
-            # Enable Kubernetes metadata decoration
-            - name: OTEL_EBPF_KUBE_METADATA_ENABLE
-              value: "true"
-            # Enable application metrics feature (required)
-            - name: OTEL_EBPF_METRIC_FEATURES
-              value: "application"
+            - name: OTEL_EBPF_CONFIG_PATH
+              value: /config/obi-config.yml
           volumeMounts:
+            - name: obi-config
+              mountPath: /config
             - name: var-run-obi
               mountPath: /var/run/obi
             - name: cgroup
               mountPath: /sys/fs/cgroup
       volumes:
+        - name: obi-config
+          configMap:
+            name: obi-config
         - name: var-run-obi
           emptyDir: {}
         - name: cgroup
