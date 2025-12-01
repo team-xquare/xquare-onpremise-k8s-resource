@@ -1,0 +1,16 @@
+beyla:
+  enabled: true
+
+  config:
+    data:
+      otel_traces_export:
+        endpoint: http://otel-collector-collector:4317
+        protocol: grpc
+      attributes:
+        kubernetes:
+          enable: false
+      routes:
+        unmatched: heuristic
+
+  tolerations:
+    - operator: Exists
