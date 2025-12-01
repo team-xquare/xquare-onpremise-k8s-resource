@@ -2,11 +2,10 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector
-  namespace: {{ .Release.Namespace }}
+  namespace: { { .Release.Namespace } }
 spec:
   mode: daemonset
   image: otel/opentelemetry-collector-contrib:0.139.0
-
   serviceAccount: otel-collector
 
   env:
@@ -19,22 +18,15 @@ spec:
         fieldRef:
           fieldPath: status.hostIP
 
-  # Volume mounts for log collection
   volumeMounts:
     - name: varlogpods
       mountPath: /var/log/pods
-      readOnly: true
-    - name: varlibdockercontainers
-      mountPath: /var/lib/docker/containers
       readOnly: true
 
   volumes:
     - name: varlogpods
       hostPath:
         path: /var/log/pods
-    - name: varlibdockercontainers
-      hostPath:
-        path: /var/lib/docker/containers
 
   resources:
     requests:
@@ -46,7 +38,6 @@ spec:
 
   config:
     receivers:
-      # OTLP receiver for application telemetry (logs, traces, metrics)
       otlp:
         protocols:
           grpc:
@@ -54,97 +45,56 @@ spec:
           http:
             endpoint: 0.0.0.0:4318
 
-      # File log receiver for all container logs
       filelog:
         include:
           - /var/log/pods/*/*/*.log
         exclude:
-          # Exclude collector's own logs to avoid loop
           - /var/log/pods/{{ .Release.Namespace }}_otel-collector-*/*/*.log
         start_at: end
         include_file_path: true
-        include_file_name: false
         operators:
-          # Parse CRI-O / containerd format
           - type: regex_parser
-            id: parser-crio
-            regex: '^(?P<time>[^ Z]+) (?P<stream>stdout|stderr) (?P<logtag>[^ ]*) ?(?P<log>.*)$'
+            regex: "^(?P<time>[^ Z]+) (?P<stream>stdout|stderr) (?P<log>.*)$"
             timestamp:
               parse_from: attributes.time
-              layout: '%Y-%m-%dT%H:%M:%S.%LZ'
-            severity:
-              parse_from: attributes.stream
-              mapping:
-                error: stderr
-                info: stdout
-
-          # Parse Docker format (fallback)
-          - type: regex_parser
-            id: parser-docker
-            regex: '^{"log":"(?P<log>.*)","stream":"(?P<stream>stdout|stderr)","time":"(?P<time>[^"]*)"}$'
-            timestamp:
-              parse_from: attributes.time
-              layout: '%Y-%m-%dT%H:%M:%S.%LZ'
-            severity:
-              parse_from: attributes.stream
-              mapping:
-                error: stderr
-                info: stdout
-
-          # Move log to body
+              layout: "%Y-%m-%dT%H:%M:%S.%LZ"
           - type: move
             from: attributes.log
             to: body
-
-          # Add log.iostream
-          - type: move
-            from: attributes.stream
-            to: attributes["log.iostream"]
-
-          # Add log file path
+            ignore_missing: true
           - type: add
             field: attributes["log.file.path"]
             value: EXPR(attributes["log.file.path"])
 
-      # Kubelet metrics
       kubeletstats:
         collection_interval: 30s
         auth_type: serviceAccount
         endpoint: https://${env:K8S_NODE_IP}:10250
         insecure_skip_verify: true
-        metric_groups:
-          - node
-          - pod
-          - container
-          - volume
+        metric_groups: [node, pod, container, volume]
 
-      # Cluster metrics
       k8s_cluster:
-        auth_type: serviceAccount
         collection_interval: 30s
+        auth_type: serviceAccount
 
     processors:
-      # Add Kubernetes metadata
       k8sattributes:
         auth_type: serviceAccount
         passthrough: false
         extract:
           metadata:
-            - k8s.namespace.name
-            - k8s.pod.name
-            - k8s.pod.uid
-            - k8s.deployment.name
-            - k8s.node.name
-            - k8s.container.name
+            [
+              k8s.namespace.name,
+              k8s.pod.name,
+              k8s.pod.uid,
+              k8s.deployment.name,
+              k8s.node.name,
+              k8s.container.name,
+            ]
         pod_association:
-          - sources:
-              - from: resource_attribute
-                name: k8s.pod.ip
-          - sources:
-              - from: resource_attribute
-                name: k8s.pod.uid
-          - sources:
-              - from: connection
+          - sources: [{ from: resource_attribute, name: k8s.pod.ip }]
+          - sources: [{ from: resource_attribute, name: k8s.pod.uid }]
+          - sources: [{ from: connection }]
 
       batch:
         timeout: 10s
@@ -156,13 +106,11 @@ spec:
         spike_limit_percentage: 25
 
     exporters:
-      # VictoriaMetrics (metrics) - no tenant (AccountID=0)
       otlphttp/vm:
         endpoint: http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/0/opentelemetry
         tls:
           insecure: true
 
-      # VictoriaLogs (logs) - no tenant (AccountID=0)
       otlphttp/vl:
         endpoint: http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428/insert/opentelemetry
         headers:
@@ -171,7 +119,6 @@ spec:
         tls:
           insecure: true
 
-      # VictoriaTraces (traces) - no tenant (AccountID=0)
       otlphttp/vt:
         endpoint: http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428/insert/opentelemetry
         headers:
@@ -182,31 +129,26 @@ spec:
 
     service:
       pipelines:
-        # Infrastructure metrics pipeline
         metrics/infra:
           receivers: [kubeletstats, k8s_cluster]
           processors: [k8sattributes, memory_limiter, batch]
           exporters: [otlphttp/vm]
 
-        # Application metrics pipeline
         metrics/app:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
           exporters: [otlphttp/vm]
 
-        # OTLP logs pipeline
-        logs/otlp:
-          receivers: [otlp]
-          processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/vl]
-
-        # File logs pipeline
         logs/file:
           receivers: [filelog]
           processors: [k8sattributes, memory_limiter, batch]
           exporters: [otlphttp/vl]
 
-        # Traces pipeline
+        logs/otlp:
+          receivers: [otlp]
+          processors: [k8sattributes, memory_limiter, batch]
+          exporters: [otlphttp/vl]
+
         traces:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
