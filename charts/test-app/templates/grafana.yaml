@@ -66,7 +66,7 @@ spec:
     name: VictoriaLogs
     type: victoriametrics-logs-datasource
     access: proxy
-    url: http://vmauth-victoria-auth.monitoring.svc/vl/tenant-{{ .Values.tenantId }}/
+    url: http://vmauth-victoria-auth.monitoring.svc:8427/vl/tenant-{{ .Values.tenantId }}/
     basicAuth: true
     editable: false
     jsonData:
@@ -97,7 +97,7 @@ spec:
     name: VictoriaMetrics
     type: prometheus
     access: proxy
-    url: http://vmauth-victoria-auth.monitoring.svc/vm/tenant-{{ .Values.tenantId }}/
+    url: http://vmauth-victoria-auth.monitoring.svc:8427/vm/tenant-{{ .Values.tenantId }}/select/0/prometheus
     basicAuth: true
     isDefault: true
     editable: false
@@ -129,7 +129,7 @@ spec:
     name: VictoriaTraces
     type: jaeger
     access: proxy
-    url: http://vmauth-victoria-auth.monitoring.svc/vt/tenant-{{ .Values.tenantId }}/
+    url: http://vmauth-victoria-auth.monitoring.svc:8427/vt/tenant-{{ .Values.tenantId }}/
     basicAuth: true
     editable: false
     secureJsonData: {}
