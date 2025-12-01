@@ -13,18 +13,26 @@ spec:
         - "/vm/tenant-{{ .Values.tenantId }}/api/v1/.*"
         - "/vm/tenant-{{ .Values.tenantId }}/prometheus/api/v1/.*"
       url_prefix: "http://vmselect-victoria-metrics.monitoring.svc:8481/select/0/"
-      drop_src_path_prefix_parts: 2  # /vm/tenant-<id>/ 제거
-      # cluster mode용 path, headers 불필요
+      headers:
+        - "AccountID: {{ .Values.tenantId }}"
+        - "ProjectID: {{ .Values.tenantId }}"
+      drop_src_path_prefix_parts: 2
 
     # Logs (VictoriaLogs single node)
     - src_paths:
         - "/vl/tenant-{{ .Values.tenantId }}/select/0/.*"
       url_prefix: "http://vlsingle-victoria-logs.monitoring.svc:9428"
-      drop_src_path_prefix_parts: 2  # /vl/tenant-<id>/ 제거
+      headers:
+        - "AccountID: {{ .Values.tenantId }}"
+        - "ProjectID: {{ .Values.tenantId }}"
+      drop_src_path_prefix_parts: 2
 
     # Traces (VictoriaTraces single node)
     - src_paths:
         - "/vt/tenant-{{ .Values.tenantId }}/api/traces.*"
       url_prefix: "http://vtsingle-victoria-traces.monitoring.svc:10428"
-      drop_src_path_prefix_parts: 2  # /vt/tenant-<id>/ 제거
+      headers:
+        - "AccountID: {{ .Values.tenantId }}"
+        - "ProjectID: {{ .Values.tenantId }}"
+      drop_src_path_prefix_parts: 2
 
