@@ -16,6 +16,9 @@ spec:
       paths:
         - "/vm/tenant-{{ .Values.tenantId }}/.*" # 메트릭 전용 path
       target_path_suffix: "/select/0/prometheus"
+      headers: # 테넌시 헤더 추가
+        - "AccountID: {{ .Values.tenantId }}"
+        - "ProjectID: {{ .Values.tenantId }}"
 
     # VictoriaLogs (로그)
     - static:
