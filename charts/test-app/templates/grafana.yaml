@@ -5,6 +5,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     dashboards: "grafana"
+    app: grafana-instance
 spec:
   config:
     log:
@@ -58,6 +59,9 @@ metadata:
   name: victorialogs
   namespace: {{ .Release.Namespace }}
 spec:
+  instanceSelector:
+    matchLabels:
+      app: grafana-instance
   datasource:
     name: VictoriaLogs
     type: victoriametrics-logs-datasource
@@ -86,6 +90,9 @@ metadata:
   name: victoriameetrics
   namespace: {{ .Release.Namespace }}
 spec:
+  instanceSelector:
+    matchLabels:
+      app: grafana-instance
   datasource:
     name: VictoriaMetrics
     type: prometheus
@@ -115,6 +122,9 @@ metadata:
   name: victoriatraces
   namespace: {{ .Release.Namespace }}
 spec:
+  instanceSelector:
+    matchLabels:
+      app: grafana-instance
   datasource:
     name: VictoriaTraces
     type: jaeger
