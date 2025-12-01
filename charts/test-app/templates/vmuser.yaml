@@ -7,32 +7,37 @@ spec:
   username: tenant-{{ .Values.tenantId }}
   password: tenant-{{ .Values.tenantId }}-password
 
-  url_map:
+  targetRefs:
     # Metrics (VictoriaMetrics Cluster)
-    - src_paths:
+    - crd:
+        kind: VMCluster/vmselect
+        name: victoria-metrics
+        namespace: monitoring
+      paths:
         - "/vm/tenant-{{ .Values.tenantId }}/api/v1/.*"
         - "/vm/tenant-{{ .Values.tenantId }}/prometheus/api/v1/.*"
-      url_prefix: "http://vmselect-victoria-metrics.monitoring.svc:8481/select/0/"
-      drop_src_path_prefix_parts: 2
-      headers: # vmauth가 요청에 자동으로 넣어주는 tenant 헤더
+      headers:
         - "AccountID: {{ .Values.tenantId }}"
         - "ProjectID: {{ .Values.tenantId }}"
+      drop_src_path_prefix_parts: 2
 
     # Logs (VictoriaLogs Single-node)
-    - src_paths:
+    - static:
+        url: http://vlsingle-victoria-logs.monitoring.svc:9428
+      paths:
         - "/vl/tenant-{{ .Values.tenantId }}/select/.*"
-      url_prefix: "http://vlsingle-victoria-logs.monitoring.svc:9428/select/"
-      drop_src_path_prefix_parts: 2
       headers:
         - "AccountID: {{ .Values.tenantId }}"
         - "ProjectID: {{ .Values.tenantId }}"
+      drop_src_path_prefix_parts: 2
 
     # Traces (VictoriaTraces Single-node)
-    - src_paths:
+    - static:
+        url: http://vtsingle-victoria-traces.monitoring.svc:10428
+      paths:
         - "/vt/tenant-{{ .Values.tenantId }}/api/traces.*"
-      url_prefix: "http://vtsingle-victoria-traces.monitoring.svc:10428/api/traces"
-      drop_src_path_prefix_parts: 2
       headers:
         - "AccountID: {{ .Values.tenantId }}"
         - "ProjectID: {{ .Values.tenantId }}"
+      drop_src_path_prefix_parts: 2
 
