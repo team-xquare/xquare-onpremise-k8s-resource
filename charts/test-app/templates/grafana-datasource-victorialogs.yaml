@@ -10,14 +10,13 @@ spec:
     access: proxy
     url: http://vmauth-victoria-auth.monitoring.svc:8427/vl/tenant-{{ .Values.tenantId }}
     basicAuth: true
-    basicAuthUser:
-      secretKeyRef:
-        name: grafana-datasource-credentials
-        key: username
-    basicAuthPassword:
-      secretKeyRef:
-        name: grafana-datasource-credentials
-        key: password
     editable: false
     jsonData:
       httpMethod: POST
+    secureJsonDataFrom:
+      basicAuthUser:
+        name: grafana-datasource-credentials
+        key: username
+      basicAuthPassword:
+        name: grafana-datasource-credentials
+        key: password
