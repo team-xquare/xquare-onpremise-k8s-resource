@@ -4,8 +4,8 @@ metadata:
   name: tenant-1
   namespace: monitoring
 spec:
-  username: tenant-1
-  password: tenant-1-password
+  username: tenant-{{ .Values.tenantId }}
+  password: tenant-{{ .Values.tenantId }}-password
 
   targetRefs:
     # Metrics (VictoriaMetrics Cluster)
