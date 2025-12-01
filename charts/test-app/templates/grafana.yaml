@@ -97,7 +97,7 @@ spec:
     name: VictoriaMetrics
     type: prometheus
     access: proxy
-    url: http://vmauth-victoria-auth.monitoring.svc:8427/vm/tenant-{{ .Values.tenantId }}/select/0/prometheus
+    url: http://vmauth-victoria-auth.monitoring.svc:8427/vm/tenant-{{ .Values.tenantId }}/
     basicAuth: true
     isDefault: true
     editable: false
