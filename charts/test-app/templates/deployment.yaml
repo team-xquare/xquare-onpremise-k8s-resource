@@ -15,14 +15,8 @@ spec:
       labels:
         app: test-app
       annotations:
-        # OpenTelemetry Sidecar 주입
-        sidecar.opentelemetry.io/inject: "monitoring/otel-sidecar"
-
         # Python Auto-Instrumentation 주입
         instrumentation.opentelemetry.io/inject-python: "true"
-
-        # 또는 특정 Instrumentation 지정
-        # instrumentation.opentelemetry.io/inject-python: "test-instrumentation"
     spec:
       containers:
       - name: app

@@ -2,11 +2,17 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: test-instrumentation
-  namespace: {{ .Release.Namespace }}
+  namespace: { { .Release.Namespace } }
 spec:
-  # OpenTelemetry Collector Endpoint (Sidecar)
+  # OpenTelemetry Collector Endpoint (DaemonSet on host network)
   exporter:
-    endpoint: http://localhost:4318
+    endpoint: http://${env:K8S_NODE_IP}:4318
+
+  env:
+    - name: K8S_NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
 
   # Propagators
   propagators:
@@ -22,61 +28,51 @@ spec:
   python:
     image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-python:latest
     env:
-    # OTLP Exporter 설정
-    - name: OTEL_EXPORTER_OTLP_ENDPOINT
-      value: "http://localhost:4318"
-    - name: OTEL_EXPORTER_OTLP_PROTOCOL
-      value: "http/protobuf"
+      # OTLP Exporter 설정 (DaemonSet on host network)
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://$(K8S_NODE_IP):4318"
+      - name: OTEL_EXPORTER_OTLP_PROTOCOL
+        value: "http/protobuf"
 
-    # Tenant ID 헤더
-    - name: OTEL_EXPORTER_OTLP_HEADERS
-      value: "X-Tenant-ID={{ .Values.tenantId }}"
+      # Service 이름
+      - name: OTEL_SERVICE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.labels['app']
 
-    # Service 이름
-    - name: OTEL_SERVICE_NAME
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.labels['app']
+      # Resource Attributes
+      - name: OTEL_RESOURCE_ATTRIBUTES
+        value: "service.namespace={{ .Release.Namespace }},deployment.name=test-app"
 
-    # Resource Attributes
-    - name: OTEL_RESOURCE_ATTRIBUTES
-      value: "service.namespace={{ .Release.Namespace }},deployment.name=test-app,tenant.id={{ .Values.tenantId }}"
+      # Logging
+      - name: OTEL_LOG_LEVEL
+        value: "info"
 
-    # Logging
-    - name: OTEL_LOG_LEVEL
-      value: "info"
-
-    # Metrics & Logs
-    - name: OTEL_METRICS_EXPORTER
-      value: "otlp"
-    - name: OTEL_LOGS_EXPORTER
-      value: "otlp"
-    - name: OTEL_TRACES_EXPORTER
-      value: "otlp"
+      # Metrics & Logs
+      - name: OTEL_METRICS_EXPORTER
+        value: "otlp"
+      - name: OTEL_LOGS_EXPORTER
+        value: "otlp"
+      - name: OTEL_TRACES_EXPORTER
+        value: "otlp"
 
   # Java Auto-Instrumentation (필요시)
   java:
     image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-java:latest
     env:
-    - name: OTEL_EXPORTER_OTLP_ENDPOINT
-      value: "http://localhost:4318"
-    - name: OTEL_EXPORTER_OTLP_HEADERS
-      value: "X-Tenant-ID={{ .Values.tenantId }}"
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://$(K8S_NODE_IP):4318"
 
   # NodeJS Auto-Instrumentation (필요시)
   nodejs:
     image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-nodejs:latest
     env:
-    - name: OTEL_EXPORTER_OTLP_ENDPOINT
-      value: "http://localhost:4318"
-    - name: OTEL_EXPORTER_OTLP_HEADERS
-      value: "X-Tenant-ID={{ .Values.tenantId }}"
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://$(K8S_NODE_IP):4318"
 
   # Go Auto-Instrumentation (필요시)
   go:
     image: ghcr.io/open-telemetry/opentelemetry-operator/autoinstrumentation-go:latest
     env:
-    - name: OTEL_EXPORTER_OTLP_ENDPOINT
-      value: "http://localhost:4318"
-    - name: OTEL_EXPORTER_OTLP_HEADERS
-      value: "X-Tenant-ID={{ .Values.tenantId }}"
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: "http://$(K8S_NODE_IP):4318"

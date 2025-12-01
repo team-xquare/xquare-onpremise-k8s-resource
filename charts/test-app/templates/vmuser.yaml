@@ -8,7 +8,7 @@ spec:
   password: tenant-{{ .Values.tenantId }}-password
 
   targetRefs:
-    # VictoriaMetrics - Read access (vmselect)
+    # VictoriaMetrics - Read only
     - crd:
         kind: VMCluster/vmselect
         name: victoria-metrics
@@ -17,33 +17,22 @@ spec:
         - "/api/v1/.*"
         - "/prometheus/api/v1/.*"
         - "/graphite/.*"
-      target_path_suffix: "/select/{{ .Values.tenantId }}/prometheus"
+      target_path_suffix: "/select/0/prometheus"
 
-    # VictoriaMetrics - Write access (vminsert)
-    - crd:
-        kind: VMCluster/vminsert
-        name: victoria-metrics
-        namespace: monitoring
-      paths:
-        - "/api/v1/write"
-        - "/prometheus/api/v1/write"
-      target_path_suffix: "/insert/{{ .Values.tenantId }}/prometheus"
-
-    # VictoriaLogs - Read/Write access
+    # VictoriaLogs - Read only
     - static:
         url: http://vlsingle-victoria-logs.monitoring.svc:9428
         headers:
-          - "AccountID: {{ .Values.tenantId }}"
+          - "AccountID: 0"
           - "ProjectID: 0"
       paths:
         - "/select/.*"
-        - "/insert/.*"
 
-    # VictoriaTraces - Jaeger UI & API
+    # VictoriaTraces - Read only (Jaeger API)
     - static:
         url: http://vtsingle-victoria-traces.monitoring.svc:10428
         headers:
-          - "AccountID: {{ .Values.tenantId }}"
+          - "AccountID: 0"
           - "ProjectID: 0"
       paths:
-        - "/select/jaeger/.*"
+        - "/select/jaeger/api/.*"
