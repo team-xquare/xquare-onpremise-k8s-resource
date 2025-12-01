@@ -15,7 +15,6 @@ spec:
         namespace: monitoring
       paths:
         - "/vm/tenant-{{ .Values.tenantId }}/.*"
-        - "/vm/tenant-{{ .Values.tenantId }}/prometheus/api/v1/.*"
       headers:
         - "AccountID: {{ .Values.tenantId }}"
         - "ProjectID: {{ .Values.tenantId }}"
