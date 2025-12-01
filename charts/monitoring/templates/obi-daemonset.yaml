@@ -1,0 +1,80 @@
+# OBI (OpenTelemetry eBPF Instrumentation) - Auto-instrumentation for traces
+# Docs: https://opentelemetry.io/docs/zero-code/obi/setup/kubernetes/
+# Image: otel/ebpf-instrument:main (official OBI image)
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: obi
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: obi
+rules:
+  # Required for Kubernetes metadata decoration
+  - apiGroups: [""]
+    resources: ["pods", "services", "nodes"]
+    verbs: ["list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["replicasets"]
+    verbs: ["list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: obi
+subjects:
+  - kind: ServiceAccount
+    name: obi
+    namespace: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: obi
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: obi
+  labels:
+    app: obi
+spec:
+  selector:
+    matchLabels:
+      app: obi
+  template:
+    metadata:
+      labels:
+        app: obi
+    spec:
+      serviceAccountName: obi
+      hostPID: true # Required for DaemonSet mode to access all processes
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+      containers:
+        - name: obi
+          image: otel/ebpf-instrument:main
+          securityContext:
+            privileged: true
+          env:
+            # Traces export to OTel Collector (gRPC)
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector-collector:4317
+            # Enable Kubernetes metadata decoration
+            - name: OTEL_EBPF_KUBE_METADATA_ENABLE
+              value: "true"
+          volumeMounts:
+            - name: var-run-obi
+              mountPath: /var/run/obi
+            - name: cgroup
+              mountPath: /sys/fs/cgroup
+      volumes:
+        - name: var-run-obi
+          emptyDir: {}
+        - name: cgroup
+          hostPath:
+            path: /sys/fs/cgroup
