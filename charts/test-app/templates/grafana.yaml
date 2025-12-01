@@ -73,7 +73,7 @@ spec:
       httpMethod: POST
     secureJsonData: {}
   valuesFrom:
-    - targetPath: datasource.secureJsonData.basicAuthUser
+    - targetPath: datasource.basicAuthUser
       valueFrom:
         secretKeyRef:
           name: grafana-datasource-credentials
@@ -105,7 +105,7 @@ spec:
       httpMethod: POST
     secureJsonData: {}
   valuesFrom:
-    - targetPath: datasource.secureJsonData.basicAuthUser
+    - targetPath: datasource.basicAuthUser
       valueFrom:
         secretKeyRef:
           name: grafana-datasource-credentials
@@ -134,7 +134,7 @@ spec:
     editable: false
     secureJsonData: {}
   valuesFrom:
-    - targetPath: datasource.secureJsonData.basicAuthUser
+    - targetPath: datasource.basicAuthUser
       valueFrom:
         secretKeyRef:
           name: grafana-datasource-credentials
