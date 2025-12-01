@@ -2,37 +2,35 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMUser
 metadata:
   name: tenant-{{ .Values.tenantId }}
-  namespace: {{ .Release.Namespace }}
+  namespace: { { .Release.Namespace } }
 spec:
   username: tenant-{{ .Values.tenantId }}
   password: tenant-{{ .Values.tenantId }}-password
 
   targetRefs:
-    # VictoriaMetrics - Read only
+    # VictoriaMetrics (메트릭)
     - crd:
         kind: VMCluster/vmselect
         name: victoria-metrics
         namespace: monitoring
       paths:
-        - "/api/v1/.*"
-        - "/prometheus/api/v1/.*"
-        - "/graphite/.*"
+        - "/vm/tenant-{{ .Values.tenantId }}/.*" # 메트릭 전용 path
       target_path_suffix: "/select/0/prometheus"
 
-    # VictoriaLogs - Read only
+    # VictoriaLogs (로그)
     - static:
         url: http://vlsingle-victoria-logs.monitoring.svc:9428
         headers:
-          - "AccountID: 0"
-          - "ProjectID: 0"
+          - "AccountID: {{ .Values.tenantId }}"
+          - "ProjectID: {{ .Values.tenantId }}"
       paths:
-        - "/select/.*"
+        - "/vl/tenant-{{ .Values.tenantId }}/.*" # 로그 전용 path
 
-    # VictoriaTraces - Read only (Jaeger API)
+    # VictoriaTraces (트레이스)
     - static:
         url: http://vtsingle-victoria-traces.monitoring.svc:10428
         headers:
-          - "AccountID: 0"
-          - "ProjectID: 0"
+          - "AccountID: {{ .Values.tenantId }}"
+          - "ProjectID: {{ .Values.tenantId }}"
       paths:
-        - "/select/jaeger/api/.*"
+        - "/vt/tenant-{{ .Values.tenantId }}/.*" # 트레이스 전용 path
