@@ -6,6 +6,8 @@ metadata:
 spec:
   retentionPeriod: "7d"
   removePvcAfterDelete: true
+  extraArgs:
+    search.traceMaxDurationWindow: "5m"
 
   storage:
     storageClassName: longhorn
