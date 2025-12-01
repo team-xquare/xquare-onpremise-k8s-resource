@@ -71,10 +71,7 @@ spec:
       serviceAccountName: obi
       hostPID: true # Required for DaemonSet mode to access all processes
       tolerations:
-        - effect: NoSchedule
-          operator: Exists
-        - effect: NoExecute
-          operator: Exists
+        - operator: Exists
       containers:
         - name: obi
           image: otel/ebpf-instrument:main
