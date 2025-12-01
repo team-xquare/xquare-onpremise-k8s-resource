@@ -19,7 +19,7 @@ spec:
         - "AccountID: {{ .Values.tenantId }}"
         - "ProjectID: {{ .Values.tenantId }}"
       drop_src_path_prefix_parts: 2
-      targetPathSuffix: "/select/{{ .Values.tenantId }}/prometheus"
+      target_path_suffix: "/select/{{ .Values.tenantId }}/prometheus"
 
     # Logs (VictoriaLogs Single-node)
     - crd:
