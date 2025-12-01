@@ -2,10 +2,9 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel-collector
-  namespace: {{ .Release.Namespace }}
+  namespace: { { .Release.Namespace } }
 spec:
   mode: daemonset
-  image: otel/opentelemetry-collector-contrib:0.139.0
   serviceAccount: otel-collector
 
   env:
@@ -49,22 +48,13 @@ spec:
         include:
           - /var/log/pods/*/*/*.log
         exclude:
-          - /var/log/pods/{{ .Release.Namespace }}_otel-collector-*/*/*.log
+          - /var/log/pods/{{ .Release.Namespace }}_otel-collector*/*.log
         start_at: end
         include_file_path: true
+        include_file_name: false
         operators:
-          - type: regex_parser
-            regex: "^(?P<time>[^ Z]+) (?P<stream>stdout|stderr) (?P<log>.*)$"
-            timestamp:
-              parse_from: attributes.time
-              layout: "%Y-%m-%dT%H:%M:%S.%LZ"
-          - type: move
-            from: attributes.log
-            to: body
-            ignore_missing: true
-          - type: add
-            field: attributes["log.file.path"]
-            value: EXPR(attributes["log.file.path"])
+          - type: container
+            id: container-parser
 
       kubeletstats:
         collection_interval: 30s
