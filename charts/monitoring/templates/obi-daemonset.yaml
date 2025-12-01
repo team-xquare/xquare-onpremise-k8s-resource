@@ -67,8 +67,8 @@ spec:
             # Enable Kubernetes metadata decoration
             - name: OTEL_EBPF_KUBE_METADATA_ENABLE
               value: "true"
-            # Enable application metrics feature (required - try both spellings)
-            - name: OTEL_EBPF_METRICS_FEATURES
+            # Enable application metrics feature (required)
+            - name: OTEL_EBPF_METRIC_FEATURES
               value: "application"
           volumeMounts:
             - name: var-run-obi
