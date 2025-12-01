@@ -4,6 +4,9 @@ metadata:
   name: victoria-traces
   namespace: {{ .Release.Namespace }}
 spec:
+  image:
+    repository: victoriametrics/victoria-traces
+    tag: v0.5.1-victorialogs
   retentionPeriod: "7d"
   removePvcAfterDelete: true
   extraArgs:
