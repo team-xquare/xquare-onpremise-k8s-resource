@@ -16,30 +16,106 @@ spec:
       admin_password: admin
     plugins:
       plugin_admin_enabled: "true"
-
   deployment:
     spec:
       replicas: 1
       template:
         spec:
           containers:
-          - name: grafana
-            env:
-            - name: GF_INSTALL_PLUGINS
-              value: "victoriametrics-logs-datasource"
-            resources:
-              requests:
-                cpu: 100m
-                memory: 256Mi
-              limits:
-                cpu: 500m
-                memory: 1Gi
-
+            - name: grafana
+              env:
+                - name: GF_INSTALL_PLUGINS
+                  value: "victoriametrics-logs-datasource"
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
   service:
     spec:
       type: NodePort
       ports:
-      - name: grafana
-        port: 3000
-        protocol: TCP
-        targetPort: 3000
+        - name: grafana
+          port: 3000
+          protocol: TCP
+          targetPort: 3000
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-datasource-credentials
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+stringData:
+  username: tenant-{{ .Values.tenantId }}
+  password: tenant-{{ .Values.tenantId }}-password
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: victorialogs
+  namespace: {{ .Release.Namespace }}
+spec:
+  datasource:
+    name: VictoriaLogs
+    type: victoriametrics-logs-datasource
+    access: proxy
+    url: vmauth-victoria-auth.monitoring.svc{{ .Values.tenantId }}
+    basicAuth: true
+    editable: false
+    jsonData:
+      httpMethod: POST
+    secureJsonDataFrom:
+      basicAuthUser:
+        name: grafana-datasource-credentials
+        key: username
+      basicAuthPassword:
+        name: grafana-datasource-credentials
+        key: password
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: victoriameetrics
+  namespace: {{ .Release.Namespace }}
+spec:
+  datasource:
+    name: VictoriaMetrics
+    type: prometheus
+    access: proxy
+    url: vmauth-victoria-auth.monitoring.svc{{ .Values.tenantId }}
+    basicAuth: true
+    isDefault: true
+    editable: false
+    jsonData:
+      httpMethod: POST
+    secureJsonDataFrom:
+      basicAuthUser:
+        name: grafana-datasource-credentials
+        key: username
+      basicAuthPassword:
+        name: grafana-datasource-credentials
+        key: password
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDatasource
+metadata:
+  name: victoriatraces
+  namespace: {{ .Release.Namespace }}
+spec:
+  datasource:
+    name: VictoriaTraces
+    type: jaeger
+    access: proxy
+    url: vmauth-victoria-auth.monitoring.svc{{ .Values.tenantId }}
+    basicAuth: true
+    editable: false
+    secureJsonDataFrom:
+      basicAuthUser:
+        name: grafana-datasource-credentials
+        key: username
+      basicAuthPassword:
+        name: grafana-datasource-credentials
+        key: password
