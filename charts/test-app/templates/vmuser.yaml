@@ -2,7 +2,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMUser
 metadata:
   name: tenant-{{ .Values.tenantId }}
-  namespace: { { .Release.Namespace } }
+  namespace: {{ .Release.Namespace }}
 spec:
   username: tenant-{{ .Values.tenantId }}
   password: tenant-{{ .Values.tenantId }}-password
