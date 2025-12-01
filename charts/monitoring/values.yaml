@@ -12,5 +12,8 @@ beyla:
       routes:
         unmatched: heuristic
 
+  service:
+    enabled: false
+
   tolerations:
     - operator: Exists
