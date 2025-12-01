@@ -67,12 +67,9 @@ spec:
             # Enable Kubernetes metadata decoration
             - name: OTEL_EBPF_KUBE_METADATA_ENABLE
               value: "true"
-            # Enable application metrics feature (required)
-            - name: OTEL_EBPF_METRIC_FEATURES
+            # Enable application metrics feature (required - try both spellings)
+            - name: OTEL_EBPF_METRICS_FEATURES
               value: "application"
-            # Enable traces instrumentation
-            - name: OTEL_EBPF_TRACES_INSTRUMENTATIONS
-              value: "*"
           volumeMounts:
             - name: var-run-obi
               mountPath: /var/run/obi
