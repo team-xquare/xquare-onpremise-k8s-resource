@@ -11,8 +11,6 @@ beyla:
           enable: false
       routes:
         unmatched: heuristic
-      prometheus_export:
-        port: 0
 
   service:
     enabled: false
