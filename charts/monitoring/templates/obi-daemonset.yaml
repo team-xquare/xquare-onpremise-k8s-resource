@@ -10,7 +10,7 @@ data:
   obi-config.yml: |
     # Discovery: target all containers in K8s
     discovery:
-      services:
+      instrument:
         - k8s_namespace: .+
     otel_traces_export:
       endpoint: http://otel-collector-collector:4317
