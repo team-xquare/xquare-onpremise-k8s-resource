@@ -13,9 +13,9 @@ data:
       instrument:
         - k8s_namespace: .+
     otel_traces_export:
-      endpoint: http://otel-collector-collector:4317
+      endpoint: http://otel-collector-collector:4318/v1/traces
     otel_metrics_export:
-      endpoint: http://otel-collector-collector:4317
+      endpoint: http://otel-collector-collector:4318/v1/metrics
       features:
         - application
     attributes:
