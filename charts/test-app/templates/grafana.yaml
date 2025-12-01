@@ -68,17 +68,19 @@ spec:
     access: proxy
     url: http://vmauth-victoria-auth.monitoring.svc:8427/vl/tenant-{{ .Values.tenantId }}/
     basicAuth: true
+    basicAuthUser: ${username}
     editable: false
     jsonData:
       httpMethod: POST
-    secureJsonData: {}
+    secureJsonData:
+      basicAuthPassword: ${password}
   valuesFrom:
-    - targetPath: datasource.basicAuthUser
+    - targetPath: basicAuthUser
       valueFrom:
         secretKeyRef:
           name: grafana-datasource-credentials
           key: username
-    - targetPath: datasource.secureJsonData.basicAuthPassword
+    - targetPath: secureJsonData.basicAuthPassword
       valueFrom:
         secretKeyRef:
           name: grafana-datasource-credentials
@@ -99,18 +101,20 @@ spec:
     access: proxy
     url: http://vmauth-victoria-auth.monitoring.svc:8427/vm/tenant-{{ .Values.tenantId }}/
     basicAuth: true
+    basicAuthUser: ${username}
     isDefault: true
     editable: false
     jsonData:
       httpMethod: POST
-    secureJsonData: {}
+    secureJsonData:
+      basicAuthPassword: ${password}
   valuesFrom:
-    - targetPath: datasource.basicAuthUser
+    - targetPath: basicAuthUser
       valueFrom:
         secretKeyRef:
           name: grafana-datasource-credentials
           key: username
-    - targetPath: datasource.secureJsonData.basicAuthPassword
+    - targetPath: secureJsonData.basicAuthPassword
       valueFrom:
         secretKeyRef:
           name: grafana-datasource-credentials
@@ -131,15 +135,17 @@ spec:
     access: proxy
     url: http://vmauth-victoria-auth.monitoring.svc:8427/vt/tenant-{{ .Values.tenantId }}/
     basicAuth: true
+    basicAuthUser: ${username}
     editable: false
-    secureJsonData: {}
+    secureJsonData:
+      basicAuthPassword: ${password}
   valuesFrom:
-    - targetPath: datasource.basicAuthUser
+    - targetPath: basicAuthUser
       valueFrom:
         secretKeyRef:
           name: grafana-datasource-credentials
           key: username
-    - targetPath: datasource.secureJsonData.basicAuthPassword
+    - targetPath: secureJsonData.basicAuthPassword
       valueFrom:
         secretKeyRef:
           name: grafana-datasource-credentials
