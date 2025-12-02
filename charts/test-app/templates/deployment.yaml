@@ -15,8 +15,6 @@ spec:
       labels:
         app: test-app
       annotations:
-        # Python Auto-Instrumentation 주입
-        instrumentation.opentelemetry.io/inject-python: "true"
     spec:
       containers:
       - name: app
