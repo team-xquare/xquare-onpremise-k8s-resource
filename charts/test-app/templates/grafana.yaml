@@ -65,7 +65,7 @@ spec:
       app: grafana-instance
   datasource:
     uid: victorialogs
-    name: VictoriaLogs
+    name: Logs
     type: victoriametrics-logs-datasource
     access: proxy
     url: http://vmauth-victoria-auth.monitoring.svc:8427/vl/tenant-{{ .Values.tenantId }}/
@@ -104,7 +104,7 @@ spec:
       app: grafana-instance
   datasource:
     uid: victoriametrics
-    name: VictoriaMetrics
+    name: Metrics
     type: prometheus
     access: proxy
     url: http://vmauth-victoria-auth.monitoring.svc:8427/vm/tenant-{{ .Values.tenantId }}/
@@ -139,7 +139,7 @@ spec:
       app: grafana-instance
   datasource:
     uid: victoriatraces
-    name: VictoriaTraces
+    name: Traces
     type: jaeger
     access: proxy
     url: http://vmauth-victoria-auth.monitoring.svc:8427/vt/tenant-{{ .Values.tenantId }}
@@ -171,4 +171,5 @@ spec:
         secretKeyRef:
           name: grafana-datasource-credentials
           key: password
+
 
