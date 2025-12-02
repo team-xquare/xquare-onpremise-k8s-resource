@@ -14,9 +14,9 @@ data:
       instrument:
         - k8s_namespace: .+
     otel_traces_export:
-      endpoint: http://otel-collector-collector:4318/v1/traces
+      endpoint: http://otel-collector-collector:4317
     otel_metrics_export:
-      endpoint: http://otel-collector-collector:4318/v1/metrics
+      endpoint: http://otel-collector-collector:4317
       features:
         - application
     attributes:
@@ -106,4 +106,5 @@ spec:
         - name: cgroup
           hostPath:
             path: /sys/fs/cgroup
+
 
