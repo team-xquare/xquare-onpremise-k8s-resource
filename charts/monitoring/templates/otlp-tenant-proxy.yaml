@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: otlp-tenant-proxy
-          image: {{ .Values.otlpProxy.image | default "injundev/otlp-tenant-proxy:latest" }}
+          image: injundev/otlp-tenant-proxy:latest
           ports:
             - name: http
               containerPort: 4318
