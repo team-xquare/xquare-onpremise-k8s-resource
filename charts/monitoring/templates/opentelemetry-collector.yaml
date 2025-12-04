@@ -98,24 +98,8 @@ spec:
         spike_limit_percentage: 25
 
     exporters:
-      otlphttp/vm:
-        endpoint: http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/0/opentelemetry
-        tls:
-          insecure: true
-
-      otlphttp/vl:
-        endpoint: http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428/insert/opentelemetry
-        headers:
-          AccountID: "0"
-          ProjectID: "0"
-        tls:
-          insecure: true
-
-      otlphttp/vt:
-        endpoint: http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428/insert/opentelemetry
-        headers:
-          AccountID: "0"
-          ProjectID: "0"
+      otlphttp/proxy:
+        endpoint: http://otlp-tenant-proxy.{{ .Release.Namespace }}.svc:4318
         tls:
           insecure: true
 
@@ -124,24 +108,24 @@ spec:
         metrics/infra:
           receivers: [kubeletstats, k8s_cluster]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/vm]
+          exporters: [otlphttp/proxy]
 
         metrics/app:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/vm]
+          exporters: [otlphttp/proxy]
 
         logs/file:
           receivers: [filelog]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/vl]
+          exporters: [otlphttp/proxy]
 
         logs/otlp:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/vl]
+          exporters: [otlphttp/proxy]
 
         traces:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/vt]
+          exporters: [otlphttp/proxy]
