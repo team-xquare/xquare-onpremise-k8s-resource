@@ -26,7 +26,7 @@ spec:
             - name: LISTEN_ADDR
               value: ":4318"
             - name: METRICS_BACKEND
-              value: "http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/opentelemetry"
+              value: "http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/multitenant/opentelemetry"
             - name: METRICS_HEADER
               value: "AccountID,ProjectID"
             - name: LOGS_BACKEND
