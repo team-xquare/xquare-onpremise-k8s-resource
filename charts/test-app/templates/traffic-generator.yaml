@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: traffic-generator
-  namespace: {{ .Release.Namespace }}
+  namespace: test-app
 spec:
   schedule: "*/1 * * * *"  # 매 1분마다 실행
   successfulJobsHistoryLimit: 3

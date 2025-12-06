@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: test-app
-  namespace: {{ .Release.Namespace }}
+  namespace: test-app
   labels:
     app: test-app
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 2
   selector:
     matchLabels:
       app: test-app
@@ -14,7 +14,6 @@ spec:
     metadata:
       labels:
         app: test-app
-      annotations:
     spec:
       containers:
       - name: app
@@ -40,8 +39,8 @@ spec:
               logger.info("Index endpoint called")
               return {
                   "message": "Hello from test-app!",
-                  "tenant_id": "{{ .Values.tenantId }}",
-                  "namespace": "{{ .Release.Namespace }}"
+                  "tenant_id": "101",
+                  "namespace": "test-app"
               }
 
           @app.route('/api/users')

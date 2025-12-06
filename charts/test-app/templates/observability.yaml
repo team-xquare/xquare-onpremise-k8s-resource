@@ -1,8 +1,56 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMUser
+metadata:
+  name: tenant-101
+  namespace: test-app
+spec:
+  username: tenant-101
+  generatePassword: true
+
+  targetRefs:
+    # Metrics (VictoriaMetrics Cluster)
+    - crd:
+        kind: VMCluster/vmselect
+        name: victoria-metrics
+        namespace: monitoring
+      paths:
+        - "/vm/tenant-101/.*"
+      headers:
+        - "AccountID: 101"
+        - "ProjectID: 0"
+      drop_src_path_prefix_parts: 2
+      target_path_suffix: "/select/101:0/prometheus"
+
+    # Logs (VictoriaLogs Single-node)
+    - crd:
+        kind: VLSingle
+        name: victoria-logs
+        namespace: monitoring
+      paths:
+        - "/vl/tenant-101/.*"
+      headers:
+        - "AccountID: 101"
+        - "ProjectID: 0"
+      drop_src_path_prefix_parts: 2
+
+    # Traces (VictoriaTraces Single-node)
+    - crd:
+        kind: VTSingle
+        name: victoria-traces
+        namespace: monitoring
+      paths:
+        - "/vt/tenant-101/.*"
+      headers:
+        - "AccountID: 101"
+        - "ProjectID: 0"
+      drop_src_path_prefix_parts: 2
+      target_path_suffix: "/select/jaeger"
+---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: Grafana
 metadata:
   name: grafana
-  namespace: {{ .Release.Namespace }}
+  namespace: test-app
   labels:
     dashboards: "grafana"
     app: grafana-instance
@@ -44,21 +92,11 @@ spec:
           protocol: TCP
           targetPort: 3000
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: grafana-datasource-credentials
-  namespace: {{ .Release.Namespace }}
-type: Opaque
-stringData:
-  username: tenant-{{ .Values.tenantId }}
-  password: tenant-{{ .Values.tenantId }}-password
----
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
   name: victorialogs
-  namespace: {{ .Release.Namespace }}
+  namespace: test-app
 spec:
   instanceSelector:
     matchLabels:
@@ -68,7 +106,7 @@ spec:
     name: Logs
     type: victoriametrics-logs-datasource
     access: proxy
-    url: http://vmauth-victoria-auth.monitoring.svc:8427/vl/tenant-{{ .Values.tenantId }}/
+    url: http://vmauth-victoria-auth.monitoring.svc:8427/vl/tenant-101/
     basicAuth: true
     basicAuthUser: ${username}
     editable: false
@@ -85,19 +123,19 @@ spec:
     - targetPath: basicAuthUser
       valueFrom:
         secretKeyRef:
-          name: grafana-datasource-credentials
+          name: vmuser-tenant-101
           key: username
     - targetPath: secureJsonData.basicAuthPassword
       valueFrom:
         secretKeyRef:
-          name: grafana-datasource-credentials
+          name: vmuser-tenant-101
           key: password
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
-  name: victoriameetrics
-  namespace: {{ .Release.Namespace }}
+  name: victoriametrics
+  namespace: test-app
 spec:
   instanceSelector:
     matchLabels:
@@ -107,7 +145,7 @@ spec:
     name: Metrics
     type: prometheus
     access: proxy
-    url: http://vmauth-victoria-auth.monitoring.svc:8427/vm/tenant-{{ .Values.tenantId }}/
+    url: http://vmauth-victoria-auth.monitoring.svc:8427/vm/tenant-101/
     basicAuth: true
     basicAuthUser: ${username}
     isDefault: true
@@ -120,19 +158,19 @@ spec:
     - targetPath: basicAuthUser
       valueFrom:
         secretKeyRef:
-          name: grafana-datasource-credentials
+          name: vmuser-tenant-101
           key: username
     - targetPath: secureJsonData.basicAuthPassword
       valueFrom:
         secretKeyRef:
-          name: grafana-datasource-credentials
+          name: vmuser-tenant-101
           key: password
 ---
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDatasource
 metadata:
   name: victoriatraces
-  namespace: {{ .Release.Namespace }}
+  namespace: test-app
 spec:
   instanceSelector:
     matchLabels:
@@ -142,12 +180,11 @@ spec:
     name: Traces
     type: jaeger
     access: proxy
-    url: http://vmauth-victoria-auth.monitoring.svc:8427/vt/tenant-{{ .Values.tenantId }}
+    url: http://vmauth-victoria-auth.monitoring.svc:8427/vt/tenant-101
     basicAuth: true
     basicAuthUser: ${username}
     editable: false
     jsonData:
-      # Grafana v12.2.0+에서 VictoriaLogs datasource로 Trace→Log 연동 지원
       tracesToLogsV2:
         datasourceUid: victorialogs
         spanStartTimeShift: '-1h'
@@ -164,12 +201,10 @@ spec:
     - targetPath: basicAuthUser
       valueFrom:
         secretKeyRef:
-          name: grafana-datasource-credentials
+          name: vmuser-tenant-101
           key: username
     - targetPath: secureJsonData.basicAuthPassword
       valueFrom:
         secretKeyRef:
-          name: grafana-datasource-credentials
+          name: vmuser-tenant-101
           key: password
-
-
