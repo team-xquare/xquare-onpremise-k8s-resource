@@ -39,7 +39,7 @@ spec:
               logger.info("Index endpoint called")
               return {
                   "message": "Hello from test-app!",
-                  "tenant_id": "101",
+                  "tenant_id": "101:101",
                   "namespace": "test-app"
               }
 

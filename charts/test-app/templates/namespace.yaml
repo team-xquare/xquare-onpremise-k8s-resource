@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   name: test-app
   labels:
-    tenant-id: "101"
+    tenant-id: "101:101"

@@ -17,9 +17,9 @@ spec:
         - "/vm/tenant-101/.*"
       headers:
         - "AccountID: 101"
-        - "ProjectID: 0"
+        - "ProjectID: 101"
       drop_src_path_prefix_parts: 2
-      target_path_suffix: "/select/101:0/prometheus"
+      target_path_suffix: "/select/101:101/prometheus"
 
     # Logs (VictoriaLogs Single-node)
     - crd:
@@ -30,7 +30,7 @@ spec:
         - "/vl/tenant-101/.*"
       headers:
         - "AccountID: 101"
-        - "ProjectID: 0"
+        - "ProjectID: 101"
       drop_src_path_prefix_parts: 2
 
     # Traces (VictoriaTraces Single-node)
@@ -42,7 +42,7 @@ spec:
         - "/vt/tenant-101/.*"
       headers:
         - "AccountID: 101"
-        - "ProjectID: 0"
+        - "ProjectID: 101"
       drop_src_path_prefix_parts: 2
       target_path_suffix: "/select/jaeger"
 ---
