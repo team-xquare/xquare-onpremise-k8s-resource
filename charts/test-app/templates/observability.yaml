@@ -6,8 +6,6 @@ metadata:
 spec:
   username: tenant-101
   generatePassword: true
-  headers:
-    - "AccountID: 101"
 
   targetRefs:
     # Metrics (VictoriaMetrics Cluster)
@@ -17,6 +15,8 @@ spec:
         namespace: monitoring
       paths:
         - "/vm/tenant-101/.*"
+      headers:
+        - "AccountID: 101"
       drop_src_path_prefix_parts: 2
       target_path_suffix: "/select/101/prometheus"
 
@@ -27,6 +27,8 @@ spec:
         namespace: monitoring
       paths:
         - "/vl/tenant-101/.*"
+      headers:
+        - "AccountID: 101"
       drop_src_path_prefix_parts: 2
 
     # Traces (VictoriaTraces Single-node)
@@ -36,6 +38,8 @@ spec:
         namespace: monitoring
       paths:
         - "/vt/tenant-101/.*"
+      headers:
+        - "AccountID: 101"
       drop_src_path_prefix_parts: 2
       target_path_suffix: "/select/jaeger"
 ---
