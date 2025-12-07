@@ -28,19 +28,19 @@ spec:
             - name: METRICS_BACKEND
               value: "http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/multitenant/opentelemetry"
             - name: METRICS_HEADER
-              value: "AccountID,ProjectID"
+              value: "AccountID"
             - name: LOGS_BACKEND
               value: "http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428/insert/opentelemetry"
             - name: LOGS_HEADER
-              value: "AccountID,ProjectID"
+              value: "AccountID"
             - name: TRACES_BACKEND
               value: "http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428/insert/opentelemetry"
             - name: TRACES_HEADER
-              value: "AccountID,ProjectID"
+              value: "AccountID"
             - name: TENANT_ATTR
               value: "tenant.id"
             - name: DEFAULT_TENANT
-              value: "0:0"
+              value: "0"
           resources:
             requests:
               cpu: 100m
