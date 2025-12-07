@@ -38,7 +38,7 @@ spec:
             - name: TRACES_HEADER
               value: "AccountID"
             - name: TENANT_ATTR
-              value: "tenant.id"
+              value: "vm_account_id"
             - name: DEFAULT_TENANT
               value: "0"
           resources:

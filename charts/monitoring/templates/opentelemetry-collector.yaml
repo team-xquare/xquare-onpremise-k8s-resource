@@ -80,7 +80,7 @@ spec:
             - k8s.node.name
             - k8s.container.name
           labels:
-            - tag_name: tenant.id
+            - tag_name: vm_account_id
               key: tenant-id
               from: namespace
         pod_association:
