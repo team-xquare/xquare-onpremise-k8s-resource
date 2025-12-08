@@ -1,43 +1,57 @@
-# Default values for descheduler
-# Descheduler basic configuration
-
 descheduler:
-  # Run as CronJob with default schedule
   kind: CronJob
-  schedule: "*/2 * * * *"  # Run every 2 minutes
+  schedule: "*/2 * * * *"
 
-  # Descheduler strategies (default enabled)
   deschedulerPolicy:
-    strategies:
-      RemoveDuplicates:
-        enabled: true
+    profiles:
+      - name: default
+        pluginConfig:
+          - name: DefaultEvictor
+            args:
+              podProtections:
+                defaultDisabled:
+                  - "PodsWithLocalStorage"
+                extraEnabled:
+                  - "PodsWithPVC"
 
-      RemovePodsViolatingInterPodAntiAffinity:
-        enabled: true
+          - name: RemoveDuplicates
 
-      RemovePodsViolatingNodeAffinity:
-        enabled: true
-        params:
-          nodeAffinityType:
-            - requiredDuringSchedulingIgnoredDuringExecution
+          - name: RemovePodsHavingTooManyRestarts
+            args:
+              podRestartThreshold: 100
+              includingInitContainers: true
 
-      RemovePodsViolatingNodeTaints:
-        enabled: true
+          - name: RemovePodsViolatingNodeAffinity
+            args:
+              nodeAffinityType:
+                - requiredDuringSchedulingIgnoredDuringExecution
 
-      RemovePodsViolatingTopologySpreadConstraint:
-        enabled: true
-        params:
-          includeSoftConstraints: false
+          - name: RemovePodsViolatingNodeTaints
 
-      LowNodeUtilization:
-        enabled: true
-        params:
-          nodeResourceUtilizationThresholds:
-            thresholds:
-              cpu: 40
-              memory: 40
-              pods: 100
-            targetThresholds:
-              cpu: 80
-              memory: 80
-              pods: 120
+          - name: RemovePodsViolatingInterPodAntiAffinity
+
+          - name: RemovePodsViolatingTopologySpreadConstraint
+
+          - name: LowNodeUtilization
+            args:
+              thresholds:
+                cpu: 40
+                memory: 40
+                pods: 100
+              targetThresholds:
+                cpu: 80
+                memory: 80
+                pods: 120
+
+        plugins:
+          balance:
+            enabled:
+              - RemoveDuplicates
+              - RemovePodsViolatingTopologySpreadConstraint
+              - LowNodeUtilization
+          deschedule:
+            enabled:
+              - RemovePodsHavingTooManyRestarts
+              - RemovePodsViolatingNodeTaints
+              - RemovePodsViolatingNodeAffinity
+              - RemovePodsViolatingInterPodAntiAffinity
