@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: otlp-tenant-proxy
-  namespace: {{ .Release.Namespace }}
+  namespace: { { .Release.Namespace } }
   labels:
     app: otlp-tenant-proxy
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: otlp-tenant-proxy
@@ -27,15 +27,11 @@ spec:
               value: ":4318"
             - name: METRICS_BACKEND
               value: "http://vminsert-victoria-metrics.{{ .Release.Namespace }}.svc:8480/insert/multitenant/opentelemetry"
-            - name: METRICS_HEADER
-              value: "AccountID"
             - name: LOGS_BACKEND
               value: "http://vlsingle-victoria-logs.{{ .Release.Namespace }}.svc:9428/insert/opentelemetry"
-            - name: LOGS_HEADER
-              value: "AccountID"
             - name: TRACES_BACKEND
               value: "http://vtsingle-victoria-traces.{{ .Release.Namespace }}.svc:10428/insert/opentelemetry"
-            - name: TRACES_HEADER
+            - name: TENANT_HEADER
               value: "AccountID"
             - name: TENANT_ATTR
               value: "vm_account_id"
@@ -65,7 +61,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: otlp-tenant-proxy
-  namespace: {{ .Release.Namespace }}
+  namespace: { { .Release.Namespace } }
   labels:
     app: otlp-tenant-proxy
 spec:
