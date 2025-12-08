@@ -1,0 +1,43 @@
+# Default values for descheduler
+# Descheduler basic configuration
+
+descheduler:
+  # Run as CronJob with default schedule
+  kind: CronJob
+  schedule: "*/2 * * * *"  # Run every 2 minutes
+
+  # Descheduler strategies (default enabled)
+  deschedulerPolicy:
+    strategies:
+      RemoveDuplicates:
+        enabled: true
+
+      RemovePodsViolatingInterPodAntiAffinity:
+        enabled: true
+
+      RemovePodsViolatingNodeAffinity:
+        enabled: true
+        params:
+          nodeAffinityType:
+            - requiredDuringSchedulingIgnoredDuringExecution
+
+      RemovePodsViolatingNodeTaints:
+        enabled: true
+
+      RemovePodsViolatingTopologySpreadConstraint:
+        enabled: true
+        params:
+          includeSoftConstraints: false
+
+      LowNodeUtilization:
+        enabled: true
+        params:
+          nodeResourceUtilizationThresholds:
+            thresholds:
+              cpu: 20
+              memory: 20
+              pods: 20
+            targetThresholds:
+              cpu: 50
+              memory: 50
+              pods: 50
