@@ -37,11 +37,11 @@ descheduler:
               thresholds:
                 cpu: 40
                 memory: 40
-                pods: 100
+                pods: 60
               targetThresholds:
-                cpu: 80
-                memory: 80
-                pods: 120
+                cpu: 75
+                memory: 75
+                pods: 90
 
         plugins:
           balance:
