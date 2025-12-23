@@ -7,23 +7,35 @@ k8s-monitoring:
       url: https://prometheus-prod-49-prod-ap-northeast-0.grafana.net./api/prom/push
       auth:
         type: basic
-        username: "<path:avp/data/grafana-k8s-monitoring#metricsUsername>"
-        password: "<path:avp/data/grafana-k8s-monitoring#apiKey>"
+        usernameKey: "metricsUsername"
+        passwordKey: "apiKey"
+        secret:
+          create: false
+          name: grafana-cloud-credentials
+          namespace: grafana-k8s-monitoring
     - name: grafana-cloud-logs
       type: loki
       url: https://logs-prod-030.grafana.net./loki/api/v1/push
       auth:
         type: basic
-        username: "<path:avp/data/grafana-k8s-monitoring#logsUsername>"
-        password: "<path:avp/data/grafana-k8s-monitoring#apiKey>"
+        usernameKey: "logsUsername"
+        passwordKey: "apiKey"
+        secret:
+          create: false
+          name: grafana-cloud-credentials
+          namespace: grafana-k8s-monitoring
     - name: gc-otlp-endpoint
       type: otlp
       url: https://otlp-gateway-prod-ap-northeast-0.grafana.net./otlp
       protocol: http
       auth:
         type: basic
-        username: "<path:avp/data/grafana-k8s-monitoring#stackUsername>"
-        password: "<path:avp/data/grafana-k8s-monitoring#apiKey>"
+        usernameKey: "stackUsername"
+        passwordKey: "apiKey"
+        secret:
+          create: false
+          name: grafana-cloud-credentials
+          namespace: grafana-k8s-monitoring
       metrics:
         enabled: true
       logs:
@@ -35,8 +47,12 @@ k8s-monitoring:
       url: https://profiles-prod-019.grafana.net.:443
       auth:
         type: basic
-        username: "<path:avp/data/grafana-k8s-monitoring#stackUsername>"
-        password: "<path:avp/data/grafana-k8s-monitoring#apiKey>"
+        usernameKey: "stackUsername"
+        passwordKey: "apiKey"
+        secret:
+          create: false
+          name: grafana-cloud-credentials
+          namespace: grafana-k8s-monitoring
   clusterMetrics:
     enabled: true
     opencost:
@@ -104,8 +120,12 @@ k8s-monitoring:
       url: https://fleet-management-prod-019.grafana.net
       auth:
         type: basic
-        username: "<path:avp/data/grafana-k8s-monitoring#stackUsername>"
-        password: "<path:avp/data/grafana-k8s-monitoring#apiKey>"
+        usernameKey: "stackUsername"
+        passwordKey: "apiKey"
+        secret:
+          create: false
+          name: grafana-cloud-credentials
+          namespace: grafana-k8s-monitoring
   alloy-singleton:
     enabled: true
     alloy:
@@ -132,8 +152,12 @@ k8s-monitoring:
       url: https://fleet-management-prod-019.grafana.net
       auth:
         type: basic
-        username: "<path:avp/data/grafana-k8s-monitoring#stackUsername>"
-        password: "<path:avp/data/grafana-k8s-monitoring#apiKey>"
+        usernameKey: "stackUsername"
+        passwordKey: "apiKey"
+        secret:
+          create: false
+          name: grafana-cloud-credentials
+          namespace: grafana-k8s-monitoring
   alloy-logs:
     enabled: true
     alloy:
@@ -164,8 +188,12 @@ k8s-monitoring:
       url: https://fleet-management-prod-019.grafana.net
       auth:
         type: basic
-        username: "<path:avp/data/grafana-k8s-monitoring#stackUsername>"
-        password: "<path:avp/data/grafana-k8s-monitoring#apiKey>"
+        usernameKey: "stackUsername"
+        passwordKey: "apiKey"
+        secret:
+          create: false
+          name: grafana-cloud-credentials
+          namespace: grafana-k8s-monitoring
   alloy-receiver:
     enabled: true
     alloy:
@@ -209,8 +237,12 @@ k8s-monitoring:
       url: https://fleet-management-prod-019.grafana.net
       auth:
         type: basic
-        username: "<path:avp/data/grafana-k8s-monitoring#stackUsername>"
-        password: "<path:avp/data/grafana-k8s-monitoring#apiKey>"
+        usernameKey: "stackUsername"
+        passwordKey: "apiKey"
+        secret:
+          create: false
+          name: grafana-cloud-credentials
+          namespace: grafana-k8s-monitoring
   alloy-profiles:
     enabled: true
     alloy:
@@ -241,5 +273,9 @@ k8s-monitoring:
       url: https://fleet-management-prod-019.grafana.net
       auth:
         type: basic
-        username: "<path:avp/data/grafana-k8s-monitoring#stackUsername>"
-        password: "<path:avp/data/grafana-k8s-monitoring#apiKey>"
+        usernameKey: "stackUsername"
+        passwordKey: "apiKey"
+        secret:
+          create: false
+          name: grafana-cloud-credentials
+          namespace: grafana-k8s-monitoring
