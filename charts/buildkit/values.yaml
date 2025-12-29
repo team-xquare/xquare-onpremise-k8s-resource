@@ -21,7 +21,7 @@ buildkit:
   rootDir: /var/lib/buildkit
   extraArgs:
     - --oci-worker-gc=true
-    - --oci-worker-gc-keepstorage=100000,150000,190000
+    - --oci-worker-gc-keepstorage=10000,10000,190000
 
 storage:
   pvc:
