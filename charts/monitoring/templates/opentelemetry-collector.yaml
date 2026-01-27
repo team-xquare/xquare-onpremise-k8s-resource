@@ -46,9 +46,9 @@ spec:
 
       filelog:
         include:
-          - /var/log/pods/*/*/*.log
+          - /var/log/pods/*-dsm-project_*/*/*.log
         exclude:
-          - /var/log/pods/{{ .Release.Namespace }}_otel-collector*/*.log
+          - /var/log/pods/{{ .Release.Namespace }}_*/*.log
         start_at: end
         include_file_path: true
         include_file_name: false
