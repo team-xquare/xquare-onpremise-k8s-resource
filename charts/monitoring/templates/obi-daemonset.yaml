@@ -14,9 +14,9 @@ data:
       services:
         - k8s_namespace: .+
     otel_traces_export:
-      endpoint: http://otel-collector-collector:4317
+      endpoint: http://otel-gateway.{{ .Release.Namespace }}.svc:4317
     otel_metrics_export:
-      endpoint: http://otel-collector-collector:4317
+      endpoint: http://otel-gateway.{{ .Release.Namespace }}.svc:4317
       features:
         - application
     attributes:

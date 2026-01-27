@@ -6,7 +6,7 @@ metadata:
   labels:
     app: otlp-tenant-proxy
 spec:
-  replicas: 3
+  replicas: 5
   selector:
     matchLabels:
       app: otlp-tenant-proxy
@@ -39,11 +39,11 @@ spec:
               value: "0"
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
               cpu: 500m
-              memory: 256Mi
+              memory: 512Mi
+            limits:
+              cpu: 2
+              memory: 2Gi
           livenessProbe:
             httpGet:
               path: /health

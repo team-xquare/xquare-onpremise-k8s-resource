@@ -32,8 +32,8 @@ spec:
       cpu: 200m
       memory: 512Mi
     limits:
-      cpu: 1
-      memory: 2Gi
+      cpu: 1500m
+      memory: 3Gi
 
   config:
     receivers:
@@ -89,43 +89,53 @@ spec:
           - sources: [{ from: connection }]
 
       batch:
-        timeout: 10s
-        send_batch_size: 1024
+        timeout: 5s
+        send_batch_size: 2048
 
       memory_limiter:
         check_interval: 1s
-        limit_percentage: 80
-        spike_limit_percentage: 25
+        limit_percentage: 75
+        spike_limit_percentage: 20
 
     exporters:
-      otlphttp/proxy:
-        endpoint: http://otlp-tenant-proxy.{{ .Release.Namespace }}.svc:4318
+      otlp/gateway:
+        endpoint: otel-gateway.{{ .Release.Namespace }}.svc:4317
         tls:
           insecure: true
+        compression: gzip
+        sending_queue:
+          enabled: true
+          num_consumers: 10
+          queue_size: 5000
+        retry_on_failure:
+          enabled: true
+          initial_interval: 5s
+          max_interval: 30s
+          max_elapsed_time: 300s
 
     service:
       pipelines:
         metrics/infra:
           receivers: [kubeletstats, k8s_cluster]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/proxy]
+          exporters: [otlp/gateway]
 
         metrics/app:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/proxy]
+          exporters: [otlp/gateway]
 
         logs/file:
           receivers: [filelog]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/proxy]
+          exporters: [otlp/gateway]
 
         logs/otlp:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/proxy]
+          exporters: [otlp/gateway]
 
         traces:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp/proxy]
+          exporters: [otlp/gateway]
