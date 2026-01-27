@@ -89,8 +89,9 @@ spec:
           - sources: [{ from: connection }]
 
       batch:
-        timeout: 10s
-        send_batch_size: 1024
+        timeout: 5s
+        send_batch_size: 2048
+        send_batch_max_size: 4096
 
       memory_limiter:
         check_interval: 1s
