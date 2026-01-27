@@ -89,7 +89,7 @@ spec:
               memory: 512Mi
             limits:
               cpu: 1
-              memory: 2Gi
+              memory: 3Gi
           env:
             - name: OTEL_EBPF_CONFIG_PATH
               value: /config/obi-config.yml
