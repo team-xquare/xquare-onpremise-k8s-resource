@@ -29,11 +29,11 @@ spec:
 
   resources:
     requests:
-      cpu: 500m
-      memory: 512Mi
+      cpu: 200m
+      memory: 256Mi
     limits:
-      cpu: 3
-      memory: 2Gi
+      cpu: 1
+      memory: 1Gi
 
   config:
     receivers:
