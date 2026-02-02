@@ -20,7 +20,7 @@ longhorn:
     concurrentReplicaRebuildPerNodeLimit: 5
     systemManagedPodsImagePullPolicy: IfNotPresent
     replicaDiskSoftAntiAffinity: true
-    guaranteedInstanceManagerCPU: 12
+    guaranteedInstanceManagerCPU: 5
     nodeDrainPolicy: block-if-contains-last-replica
     autoCleanupSystemGeneratedSnapshot: true
     longGRPCTimeOut: 1800
