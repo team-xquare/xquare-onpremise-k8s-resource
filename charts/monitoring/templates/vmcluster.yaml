@@ -21,11 +21,11 @@ spec:
               storage: 100Gi
     resources:
       requests:
-        cpu: 500m
-        memory: 1Gi
+        cpu: 200m
+        memory: 512Mi
       limits:
-        cpu: 2
-        memory: 4Gi
+        cpu: 1
+        memory: 2Gi
 
   vmselect:
     replicaCount: 2
@@ -41,18 +41,18 @@ spec:
               storage: 10Gi
     resources:
       requests:
-        cpu: 250m
-        memory: 512Mi
+        cpu: 100m
+        memory: 256Mi
       limits:
-        cpu: 1
-        memory: 2Gi
+        cpu: 500m
+        memory: 1Gi
 
   vminsert:
     replicaCount: 2
     resources:
       requests:
-        cpu: 250m
-        memory: 512Mi
+        cpu: 100m
+        memory: 256Mi
       limits:
-        cpu: 1
-        memory: 2Gi
+        cpu: 500m
+        memory: 1Gi
