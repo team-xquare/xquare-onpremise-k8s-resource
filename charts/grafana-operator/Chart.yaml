@@ -8,4 +8,4 @@ appVersion: "v5.20.0"
 dependencies:
   - name: grafana-operator
     repository: https://grafana.github.io/helm-charts
-    version: "v5.20.0"
+    version: 5.21.4
