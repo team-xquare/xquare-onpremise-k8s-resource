@@ -7,5 +7,5 @@ description: A Helm chart for cert-manager
 home: https://github.com/cert-manager/cert-manager
 dependencies:
   - name: cert-manager
-    version: 1.19.3
+    version: 1.20.0
     repository: https://charts.jetstack.io
