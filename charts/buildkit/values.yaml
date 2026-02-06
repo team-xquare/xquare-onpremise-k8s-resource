@@ -1,6 +1,6 @@
 image:
   repository: moby/buildkit
-  tag: v0.25.2
+  tag: 0.27.1
   pullPolicy: IfNotPresent
 
 namespace: buildkit
