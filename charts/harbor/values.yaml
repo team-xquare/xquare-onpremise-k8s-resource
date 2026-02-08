@@ -18,7 +18,16 @@ harbor:
   persistence:
     persistentVolumeClaim:
       registry:
+        storageClass: longhorn
         size: 300Gi
+      jobservice:
+        storageClass: longhorn
+      database:
+        storageClass: longhorn
+      redis:
+        storageClass: longhorn
+      trivy:
+        storageClass: longhorn
 
   updateStrategy:
     type: Recreate
