@@ -8,4 +8,4 @@ appVersion: "v0.65.0"
 dependencies:
   - name: victoria-metrics-operator
     repository: https://victoriametrics.github.io/helm-charts/
-    version: "0.56.4"
+    version: 0.58.1
