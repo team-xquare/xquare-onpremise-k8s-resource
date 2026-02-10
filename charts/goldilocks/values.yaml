@@ -25,3 +25,7 @@ goldilocks:
       requests:
         cpu: 25m
         memory: 64Mi
+    readinessProbe:
+      initialDelaySeconds: 5
+    livenessProbe:
+      initialDelaySeconds: 5
