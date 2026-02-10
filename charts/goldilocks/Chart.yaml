@@ -6,5 +6,5 @@ version: 1.0.0
 appVersion: "8.0.2"
 dependencies:
   - name: goldilocks
-    version: 8.0.2
+    version: 10.2.0
     repository: "https://charts.fairwinds.com/stable"
