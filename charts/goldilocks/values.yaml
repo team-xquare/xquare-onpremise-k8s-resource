@@ -1,0 +1,27 @@
+goldilocks:
+  vpa:
+    enabled: false
+
+  controller:
+    enabled: true
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 25m
+        memory: 64Mi
+
+  dashboard:
+    enabled: true
+    replicaCount: 1
+    service:
+      type: ClusterIP
+      port: 80
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 25m
+        memory: 64Mi

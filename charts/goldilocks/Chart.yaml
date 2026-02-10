@@ -1,0 +1,10 @@
+apiVersion: v2
+name: goldilocks
+description: Goldilocks VPA recommendations dashboard
+type: application
+version: 1.0.0
+appVersion: "8.0.2"
+dependencies:
+  - name: goldilocks
+    version: 8.0.2
+    repository: "https://charts.fairwinds.com/stable"
