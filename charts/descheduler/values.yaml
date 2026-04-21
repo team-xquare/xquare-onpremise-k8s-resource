@@ -40,23 +40,28 @@ descheduler:
 
           - name: RemovePodsViolatingTopologySpreadConstraint
 
-          - name: LowNodeUtilization
-            args:
-              thresholds:
-                cpu: 40
-                memory: 40
-                pods: 60
-              targetThresholds:
-                cpu: 75
-                memory: 75
-                pods: 90
+          # LowNodeUtilization disabled: worker01/02 are 6-core, worker03/04 are 24-core.
+          # descheduler evicts pods from "overutilized" workers but scheduler reschedules
+          # them onto worker03 (LeastAllocated scoring favors high-capacity nodes), creating
+          # a pong-pong loop that drove worker03 IPAM to 227/254. Re-enable only after
+          # node CPU capacity is homogenized or topology spread constraints are in place.
+          # - name: LowNodeUtilization
+          #   args:
+          #     thresholds:
+          #       cpu: 40
+          #       memory: 40
+          #       pods: 60
+          #     targetThresholds:
+          #       cpu: 75
+          #       memory: 75
+          #       pods: 90
 
         plugins:
           balance:
             enabled:
               - RemoveDuplicates
               - RemovePodsViolatingTopologySpreadConstraint
-              - LowNodeUtilization
+              # - LowNodeUtilization
           deschedule:
             enabled:
               - RemovePodsHavingTooManyRestarts
