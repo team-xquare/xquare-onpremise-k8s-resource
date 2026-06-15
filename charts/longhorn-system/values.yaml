@@ -27,9 +27,9 @@ longhorn:
     autoCleanupSystemGeneratedSnapshot: "true"
     longGRPCTimeOut: "1800"
 
-  # 1.11→1.12 업그레이드 경로 검증을 위해 활성화(업그레이드 전 안전 게이트).
+  # 업그레이드 시에만 일시 활성화. 평상시 false (sync마다 pre-upgrade job 도는 것 방지).
   preUpgradeChecker:
-    jobEnabled: true
+    jobEnabled: false
 
   persistence:
     defaultClassReplicaCount: "3"
