@@ -9,11 +9,16 @@ longhorn:
     storageMinimalAvailablePercentage: "25"
     storageOverProvisioningPercentage: "200"
     allowVolumeCreationWithDegradedAvailability: "false"
-    fastReplicaRebuildEnabled: "true"
+    # 2026-06: fast-replica-rebuild의 snapshot-hash 단계가 리빌드 replica를
+    # 즉사시켜(connection refused) 100여 볼륨이 degraded 고착되는 사고 발생.
+    # 비활성화 시 풀카피 리빌드로 동작이 안정적이라 false로 고정. 재활성화는
+    # 별도 검증 후 진행할 것.
+    fastReplicaRebuildEnabled: "false"
     offlineReplicaRebuilding: "true"
     orphanResourceAutoDeletion: "instance"
     autoCleanupSnapshotWhenDeleteBackup: "true"
-    snapshotDataIntegrity: enabled
+    # fast-replica-rebuild 사고와 연계된 snapshot 해시 경로 이슈로 함께 비활성화.
+    snapshotDataIntegrity: disabled
     concurrentReplicaRebuildPerNodeLimit: "5"
     systemManagedPodsImagePullPolicy: IfNotPresent
     replicaDiskSoftAntiAffinity: "true"
