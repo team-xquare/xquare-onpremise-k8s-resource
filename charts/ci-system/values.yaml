@@ -23,14 +23,14 @@ vault:
   serviceAccount: ci-system-vault-sa
   authName: ci-system-infra-vault-auth
 
-# Single central EventBus. Engine "native" mirrors the proven per-project STAN config
-# (guaranteed to come up). Switch to jetstream for prod once a supported version is pinned.
+# Single central EventBus. JetStream (not STAN/native) is REQUIRED: STAN forbids multiple
+# dependencies on the same EventSource+eventName in one Sensor, which blocks the per-project
+# sensor (one Sensor, one dependency+trigger per app). JetStream allows it.
 eventbus:
   name: ci-central-eventbus
-  engine: native            # native | jetstream
+  engine: jetstream         # native | jetstream
   replicas: 3
-  jetstreamVersion: "2.10.10"   # only used when engine=jetstream; pin to a version the
-                                # installed argo-events controller supports
+  jetstreamVersion: "latest"   # version KEY from argo-events controller config (→ nats:2.10.10)
   resources:
     requests:
       cpu: 100m
