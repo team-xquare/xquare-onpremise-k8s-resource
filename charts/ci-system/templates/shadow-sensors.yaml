@@ -1,0 +1,112 @@
+{{- /*
+Shadow echo Sensors — one per watched app, all living in ci-system (same ns as the
+central EventBus + EventSource, as Argo Events requires). Each subscribes to the single
+central EventSource, filters for its repo+branch, and creates an ECHO workflow that only
+logs the routing decision. NO real build/deploy happens. This proves the full path
+(receive → HMAC verify → filter → route) in parallel with existing CI.
+*/ -}}
+{{- range $p := .Values.shadowProjects }}
+{{- range $app := $p.applications }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: shadow-{{ $app.name }}
+  namespace: {{ $.Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: ci-system
+    app.kubernetes.io/component: shadow-sensor
+    ci.xquare/project: {{ $p.project }}
+spec:
+  eventBusName: {{ $.Values.eventbus.name }}
+  template:
+    serviceAccountName: ci-shadow-sa
+    container:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 30Mi
+        limits:
+          cpu: 50m
+          memory: 64Mi
+  dependencies:
+    - name: gh
+      eventSourceName: {{ $.Values.eventsource.name }}
+      eventName: {{ $.Values.eventsource.eventName }}
+      filters:
+        script: |
+          -- allow the GitHub "ping" so you can confirm delivery wiring
+          if event.body['X-GitHub-Event'] == 'ping' then return true end
+          -- only pushes, only this repo, only this branch
+          if event.body['X-GitHub-Event'] ~= 'push' then return false end
+          if event.body.repository == nil then return false end
+          if event.body.repository.full_name ~= '{{ $app.owner }}/{{ $app.repo }}' then return false end
+          if event.body.ref ~= 'refs/heads/{{ $app.branch }}' then return false end
+          return true
+  triggers:
+    - template:
+        name: echo
+        k8s:
+          operation: create
+          parameters:
+            - src:
+                dependencyName: gh
+                dataKey: body.repository.full_name
+                value: "unknown"
+              dest: spec.arguments.parameters.1.value
+            - src:
+                dependencyName: gh
+                dataKey: body.ref
+                value: "unknown"
+              dest: spec.arguments.parameters.2.value
+            - src:
+                dependencyName: gh
+                dataKey: body.after
+                value: "unknown"
+              dest: spec.arguments.parameters.3.value
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: shadow-echo-{{ $app.name }}-
+                namespace: {{ $.Values.namespace }}
+                labels:
+                  app.kubernetes.io/component: shadow-echo
+                  ci.xquare/app: {{ $app.name }}
+              spec:
+                entrypoint: echo
+                serviceAccountName: ci-shadow-sa
+                podGC:
+                  strategy: OnPodCompletion
+                  deleteDelayDuration: 1h
+                arguments:
+                  parameters:
+                    - name: app
+                      value: {{ $app.name }}
+                    - name: repo
+                      value: "unknown"
+                    - name: ref
+                      value: "unknown"
+                    - name: sha
+                      value: "unknown"
+                templates:
+                  - name: echo
+                    inputs:
+                      parameters:
+                        - name: app
+                        - name: repo
+                        - name: ref
+                        - name: sha
+                    container:
+                      image: alpine:3.20
+                      command: [sh, -c]
+                      args:
+                        - >-
+                          echo "[SHADOW] would trigger CI:
+                          app={{ "{{inputs.parameters.app}}" }}
+                          repo={{ "{{inputs.parameters.repo}}" }}
+                          ref={{ "{{inputs.parameters.ref}}" }}
+                          sha={{ "{{inputs.parameters.sha}}" }}"
+{{- end }}
+{{- end }}

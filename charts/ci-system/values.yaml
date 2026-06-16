@@ -1,0 +1,55 @@
+# ── Central CI eventing (shadow) ────────────────────────────────────────────
+# Namespace is fixed to the chart name (ci-system) via the k8s-resource ApplicationSet.
+
+namespace: ci-system
+
+webhook:
+  # Public host the GitHub webhook(s) POST to. Use a NEW host for shadow so it never
+  # collides with the existing argo-events-xquare-infra.dsmhs.kr.
+  host: argo-events-shadow.dsmhs.kr
+  endpoint: /github
+  port: 12000
+  # K8s secret (Opaque, key "secret") holding the HMAC shared secret.
+  # NOT created by this chart — create it manually (shadow) or via Vault (prod).
+  # See README.md "1) Webhook secret".
+  secretName: github-central-webhook-secret
+
+# Single central EventBus. Engine "native" mirrors the proven per-project STAN config
+# (guaranteed to come up). Switch to jetstream for prod once a supported version is pinned.
+eventbus:
+  name: ci-central-eventbus
+  engine: native            # native | jetstream
+  replicas: 3
+  jetstreamVersion: "2.10.10"   # only used when engine=jetstream; pin to a version the
+                                # installed argo-events controller supports
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+eventsource:
+  name: github-central
+  eventName: webhook
+  replicas: 2
+  # Placeholder org only to satisfy validation (receive-only mode does NOT use it for
+  # scoping — delivery scope is whatever webhook POSTs to the endpoint).
+  validationOrg: team-xquare
+
+# ── Shadow observation targets ───────────────────────────────────────────────
+# Repos to watch in parallel. For each, add a SECOND webhook on the repo (or org) in
+# GitHub pointing at https://<webhook.host><webhook.endpoint> with the shadow secret.
+# The echo Sensor logs the routing decision WITHOUT running a real build.
+shadowProjects:
+  - project: mozu
+    applications:
+      - name: mozu-server-v2-prod
+        owner: team-mozu
+        repo: mozu-BE-v2
+        branch: main
+      - name: mozu-server-v2-stag
+        owner: team-mozu
+        repo: mozu-BE-v2
+        branch: develop

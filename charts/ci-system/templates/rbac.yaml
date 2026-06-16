@@ -1,0 +1,46 @@
+# SA used by the shadow Sensors (to create echo Workflows) and by the echo Workflows
+# themselves (to run). Scoped to ci-system only — shadow echo never leaves this ns.
+#
+# PHASE 2 (real cutover): the per-project Sensors will instead create Workflows INTO each
+# project namespace. At that point this becomes a ClusterRole + per-project RoleBinding so
+# the central Sensor SA can create workflows in <project>-dsm-project, while the workflows
+# still run as that project's own ci-workflow-sa. (Not needed for shadow observation.)
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ci-shadow-sa
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: ci-system
+    app.kubernetes.io/component: shadow-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ci-shadow-role
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: ci-system
+rules:
+  - apiGroups: ["argoproj.io"]
+    resources: ["workflows", "workflowtaskresults"]
+    verbs: ["create", "get", "list", "watch", "update", "patch", "delete"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch", "create", "delete", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-shadow-rolebinding
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: ci-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ci-shadow-role
+subjects:
+  - kind: ServiceAccount
+    name: ci-shadow-sa
+    namespace: {{ .Values.namespace }}

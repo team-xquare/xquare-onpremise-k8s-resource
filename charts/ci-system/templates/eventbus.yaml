@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventBus
+metadata:
+  name: {{ .Values.eventbus.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: ci-system
+    app.kubernetes.io/component: eventbus
+spec:
+{{- if eq .Values.eventbus.engine "jetstream" }}
+  jetstream:
+    version: {{ .Values.eventbus.jetstreamVersion | quote }}
+    replicas: {{ .Values.eventbus.replicas }}
+    containerTemplate:
+      resources:
+        requests:
+          cpu: {{ .Values.eventbus.resources.requests.cpu }}
+          memory: {{ .Values.eventbus.resources.requests.memory }}
+        limits:
+          cpu: {{ .Values.eventbus.resources.limits.cpu }}
+          memory: {{ .Values.eventbus.resources.limits.memory }}
+{{- else }}
+  nats:
+    native:
+      replicas: {{ .Values.eventbus.replicas }}
+      antiAffinity: false
+      auth: none
+      containerTemplate:
+        resources:
+          requests:
+            cpu: {{ .Values.eventbus.resources.requests.cpu }}
+            memory: {{ .Values.eventbus.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.eventbus.resources.limits.cpu }}
+            memory: {{ .Values.eventbus.resources.limits.memory }}
+{{- end }}

@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: {{ .Values.eventsource.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: ci-system
+    app.kubernetes.io/component: eventsource
+spec:
+  eventBusName: {{ .Values.eventbus.name }}
+  replicas: {{ .Values.eventsource.replicas }}
+  service:
+    ports:
+      - port: {{ .Values.webhook.port }}
+        targetPort: {{ .Values.webhook.port }}
+  github:
+    # eventName = key below. Sensors reference eventName: {{ .Values.eventsource.eventName }}
+    {{ .Values.eventsource.eventName }}:
+      # RECEIVE-ONLY: no apiToken and no githubApp ⇒ NeedToCreateHooks()=false ⇒ Argo
+      # creates NO webhook. It only receives POSTs and verifies the HMAC signature
+      # (gh.ValidatePayload) against webhookSecret. The webhook itself is the GitHub
+      # App's / org's own webhook pointed at this endpoint.
+      organizations:
+        # validation placeholder only (one of repositories/organizations is required);
+        # NOT used for scoping in receive-only mode.
+        - {{ .Values.eventsource.validationOrg }}
+      webhook:
+        endpoint: {{ .Values.webhook.endpoint }}
+        port: "{{ .Values.webhook.port }}"
+        method: POST
+        url: https://{{ .Values.webhook.host }}
+      webhookSecret:
+        name: {{ .Values.webhook.secretName }}
+        key: secret
+      insecure: false
