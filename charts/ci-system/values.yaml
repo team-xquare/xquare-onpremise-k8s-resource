@@ -63,9 +63,3 @@ shadowProjects:
         owner: team-mozu
         repo: mozu-BE-v2
         branch: develop
-      # TEMP self-test: matches a throwaway branch that existing CI ignores (no real deploy).
-      # Remove after parity is confirmed.
-      - name: shadow-selftest
-        owner: team-mozu
-        repo: mozu-BE-v2
-        branch: ci-shadow-test

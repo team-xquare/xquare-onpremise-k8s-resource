@@ -1,0 +1,29 @@
+# Phase-2 central sensor identity. The per-project central Sensors (rendered by the
+# project gitops-repo chart into THIS namespace) run as this SA and create Workflows INTO
+# each project namespace. The cluster-wide create permission is granted per-project via a
+# RoleBinding in each project ns (project gitops-repo: ci-central-rolebinding.yaml), so the
+# blast radius is exactly the namespaces that opted in — not all namespaces.
+#
+# The Workflows themselves still run as the project's own ci-workflow-sa, so build isolation
+# is unchanged.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ci-central-sensor-sa
+  namespace: {{ .Values.namespace }}
+  labels:
+    app.kubernetes.io/part-of: ci-system
+    app.kubernetes.io/component: central-sensor-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ci-central-sensor-wf
+  labels:
+    app.kubernetes.io/part-of: ci-system
+    app.kubernetes.io/component: central-sensor-clusterrole
+rules:
+  # create the triggered Workflow in the target (project) namespace.
+  - apiGroups: ["argoproj.io"]
+    resources: ["workflows"]
+    verbs: ["create", "get", "list", "watch"]
