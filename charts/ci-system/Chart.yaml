@@ -1,10 +1,10 @@
 apiVersion: v2
 name: ci-system
 description: |
-  Centralized CI eventing (shadow). One Jetstream/NATS EventBus + one receive-only
-  GitHub EventSource for the whole platform, replacing the per-app EventSource/Sensor/
-  per-project EventBus footprint. Runs in parallel with the existing per-app CI for
-  parity observation — does NOT touch existing CI.
+  Centralized CI eventing for the platform: one EventBus + one receive-only GitHub
+  EventSource shared by all projects. Per-project/app Sensors live in the project
+  gitops-repo chart and route off this single stream. Replaces the per-app
+  EventSource/Sensor + per-project EventBus footprint.
 type: application
 version: 0.1.0
 appVersion: "v1.9.3"

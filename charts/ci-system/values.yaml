@@ -1,18 +1,17 @@
-# ── Central CI eventing (shadow) ────────────────────────────────────────────
+# ── Central CI eventing ──────────────────────────────────────────────────────
 # Namespace is fixed to the chart name (ci-system) via the k8s-resource ApplicationSet.
 
 namespace: ci-system
 
 webhook:
-  # Public host the GitHub webhook(s) POST to. Use a NEW host for shadow so it never
-  # collides with the existing argo-events-xquare-infra.dsmhs.kr.
-  host: argo-events-shadow.dsmhs.kr
+  # Public host the GitHub App webhook POSTs to (DNS → external gateway).
+  host: argo-events-ci.dsmhs.kr
   endpoint: /github
   port: 12000
   # K8s secret (key "secret") holding the HMAC shared secret.
   secretName: github-central-webhook-secret
   # "vault"  → VaultStaticSecret pulls it from Vault (GitOps, like ci-github-secrets)
-  # "manual" → you create the k8s secret out-of-band (quick shadow start)
+  # "manual" → you create the k8s secret out-of-band
   secretSource: vault
 
 # Vault (vault-secrets-operator) — same mount/role the project chart's CI secrets use.
@@ -48,18 +47,6 @@ eventsource:
   # scoping — delivery scope is whatever webhook POSTs to the endpoint).
   validationOrg: team-xquare
 
-# ── Shadow observation targets ───────────────────────────────────────────────
-# Repos to watch in parallel. For each, add a SECOND webhook on the repo (or org) in
-# GitHub pointing at https://<webhook.host><webhook.endpoint> with the shadow secret.
-# The echo Sensor logs the routing decision WITHOUT running a real build.
-shadowProjects:
-  - project: mozu
-    applications:
-      - name: mozu-server-v2-prod
-        owner: team-mozu
-        repo: mozu-BE-v2
-        branch: main
-      - name: mozu-server-v2-stag
-        owner: team-mozu
-        repo: mozu-BE-v2
-        branch: develop
+# NOTE: per-project/per-app Sensors live in the project gitops-repo chart
+# (ci-central-sensor.yaml), NOT here. This chart is central platform infra only:
+# EventBus + receive-only EventSource + HTTPRoute + central sensor SA/ClusterRole + Vault.

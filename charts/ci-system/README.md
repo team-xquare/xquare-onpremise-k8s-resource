@@ -1,126 +1,66 @@
-# ci-system — Centralized CI eventing (SHADOW)
+# ci-system — Centralized CI eventing
 
-Runs **one** central EventBus + **one** receive-only GitHub EventSource for the whole
-platform, replacing the current per-app footprint:
+One **EventBus** + one **receive-only GitHub EventSource** shared by every project, fed by
+the **XQUARE-INFRASTRUCTURE GitHub App's single webhook**. Per-project/app **Sensors live in
+the project gitops-repo chart** (`ci-central-sensor.yaml`) and route off this one stream —
+nothing project-specific lives here.
 
-| | now (per-app) | this (central) |
+Replaces the old per-app footprint:
+
+| | per-app (old) | central (this) |
 |---|---|---|
 | EventSource | 89 | **1** (receive-only) |
-| Sensor | 89 | per-project (shadow: 2 echo) |
+| Sensor | 89 | per-project, in this ns (gitops-repo chart) |
 | EventBus (STAN) | 35 × 3 = 105 pods | **1 × 3** |
-| GitHub webhooks | 86 auto-created | **0** created by Argo (App/org webhook feeds it) |
+| GitHub webhooks | 86 auto-created | **0** created by Argo (App webhook feeds it) |
 | installationId wiring | 29 | **0** |
 
-It runs **in parallel** with existing CI and **does not touch it**. The shadow Sensors only
-log a routing decision (echo Workflow) — no real build/deploy.
+The k8s-resource ApplicationSet auto-creates an ArgoCD app `ci-system` (ns `ci-system`).
 
-The k8s-resource ApplicationSet auto-creates an ArgoCD app `ci-system` (ns `ci-system`,
-`CreateNamespace=true`, prune+selfHeal) the moment `charts/ci-system/` is pushed. **Nothing
-happens until you commit & push.**
+## How it works (argo-events v1.9.3)
 
----
-
-## How it works (verified against argo-events v1.9.3 source)
-
-- EventSource has **no `apiToken` / `githubApp`** ⇒ `NeedToCreateHooks()=false` ⇒ Argo
+- No `apiToken` / `githubApp` on the EventSource ⇒ `NeedToCreateHooks()=false` ⇒ Argo
   creates **no** webhook. It only receives POSTs.
-- Every request is HMAC-verified: `parseValidateRequest → gh.ValidatePayload(r, secret)`
-  against `webhookSecret`. Bad/absent signature ⇒ `request is not valid ... discarding`.
-- `organizations: [team-xquare]` is only there to pass validation (one of
-  repositories/organizations is required); it does **not** scope delivery in receive-only
-  mode. Delivery scope = wherever the webhook is installed.
-- The GitHub push body already contains `X-GitHub-Event` (Argo injects it), so the Sensor
-  filters on `body['X-GitHub-Event']`, `body.repository.full_name`, `body.ref` — same shape
-  your existing prod sensors already use.
+- Every request is HMAC-verified (`gh.ValidatePayload` against `webhookSecret`); bad/absent
+  signature is discarded.
+- `organizations: [team-xquare]` only satisfies validation (receive-only doesn't scope on it;
+  delivery scope = wherever the App is installed).
+- GitHub injects `X-GitHub-Event` into the body, so project Sensors filter on
+  `body['X-GitHub-Event']`, `body.repository.full_name`, `body.ref`.
 
----
+## What this chart contains (central only)
 
-## 1) Webhook secret (Vault — same pattern as ci-github-secrets)
+`EventBus` · `EventSource` (receive-only) · `HTTPRoute` · `ServiceAccount ci-central-sensor-sa`
+\+ `ClusterRole ci-central-sensor-wf` (cross-ns workflow create) · Vault `VaultAuth` +
+`VaultStaticSecret`. **No Sensors.**
 
-`secretSource: vault` (default) makes the chart create a `VaultAuth` + `VaultStaticSecret`
-that materializes `github-central-webhook-secret` (key `secret`) from Vault — exactly like
-the project chart's `github-app-pem` / `github-token`. Put the HMAC value into Vault once:
+## Setup
+
+**1) Webhook secret (Vault)** — same pattern as the project chart's `ci-github-secrets`:
+```bash
+vault kv put xquare-infra-kv/ci-central-webhook secret=$(openssl rand -hex 32)
+```
+Reuse that value as the GitHub App webhook secret (step 3).
+
+**2) DNS + gateway** — point `webhook.host` (default `argo-events-ci.dsmhs.kr`) at the external
+gateway; the listener `allowedRoutes` must permit ns `ci-system` (usually `From: All`).
+
+**3) GitHub App (XQUARE-INFRASTRUCTURE)** — Webhook URL = `https://<webhook.host>/github`,
+secret = step 1, content type `application/json`. Permissions: Contents `Read` (+ Metadata).
+**Subscribe to events: Push** (each installation must accept the update before push events
+flow). Installed on the orgs you want to build, with repo access.
+
+## Opt a project into central eventing
+
+In the project gitops-repo, set `centralEventing: true` in that project's values file. That
+renders the per-project Sensors (in `ci-system`) + a RoleBinding for the central SA. To avoid
+double builds, also disable that project's old per-app Sensor (guard `ci-sensor.yaml` /
+`ci-event-source.yaml`, or scale it to 0) as you migrate.
+
+## Verify
 
 ```bash
-# value stays in Vault, never in git
-vault kv put xquare-infra-kv/ci-central-webhook \
-  secret=$(openssl rand -hex 32)
-# (reuse the SAME value in the GitHub webhook secret field, step 4)
+kubectl -n ci-system logs deploy/github-central-eventsource -f   # receipt + HMAC
+kubectl -n ci-system get eventbus,eventsource                    # health
+kubectl -n <project>-dsm-project get wf -w                       # dispatched builds
 ```
-
-If you already created the secret manually, delete it so VSO can own it:
-`kubectl -n ci-system delete secret github-central-webhook-secret`
-
-Quick-start alternative: set `webhook.secretSource: manual` and create the k8s secret
-yourself (`kubectl -n ci-system create secret generic github-central-webhook-secret
---from-literal=secret=...`).
-
-## 2) Gateway host + DNS
-
-- Point DNS `argo-events-shadow.dsmhs.kr` at the external gateway (same target as
-  `argo-events-xquare-infra.dsmhs.kr`).
-- Confirm the `external-gateway` listener `allowedRoutes` permits namespace `ci-system`
-  (your per-project routes already attach cross-ns, so this is usually `From: All`).
-
-## 3) Push & let ArgoCD sync
-```bash
-git add charts/ci-system && git commit -m "add ci-system shadow eventing" && git push
-```
-Watch the app come up:
-```bash
-kubectl -n ci-system get eventbus,eventsource,sensor,pods
-```
-
-## 4) Feed it (non-destructive)
-
-Existing per-app webhooks are untouched. Add a **second** webhook on each repo you want to
-observe (Settings → Webhooks → Add), e.g. `team-mozu/mozu-BE-v2`:
-
-- Payload URL: `https://argo-events-shadow.dsmhs.kr/github`
-- Content type: `application/json`
-- Secret: the value from step 1
-- Events: Just the push event (and the initial `ping` is sent automatically)
-
-(Multi-org full rollout later replaces this with the GitHub App's single App-level webhook.)
-
----
-
-## 5) Observe — parity checklist
-
-```bash
-# A. receipt + HMAC verification
-kubectl -n ci-system logs deploy/github-central-eventsource -f
-#   ✔ ping/push logged   ✖ "discarding" = secret mismatch
-
-# B. filter + routing decision
-kubectl -n ci-system logs -l app.kubernetes.io/component=shadow-sensor -f
-
-# C. echo workflow = the routing decision, no real build
-kubectl -n ci-system get wf
-kubectl -n ci-system logs <shadow-echo-pod>   # "[SHADOW] would trigger CI: app=... sha=..."
-```
-
-Confirm before cutover:
-1. Every push that triggered the **old** CI also reaches the central EventSource.
-2. Wrong-signature POST is rejected (flip the secret to test).
-3. Echo routing (app/branch) matches what the old per-app Sensor did.
-4. Resource delta: `kubectl -n ci-system top pod` vs the ~290 per-app pods.
-
----
-
-## 6) Cutover (phase 2 — separate change)
-
-Once parity holds:
-1. Move per-project **Sensors** into the project chart (rendered with `namespace: ci-system`),
-   replacing the echo Workflow with the real `workflowTemplateRef` and
-   `metadata.namespace: <project>-dsm-project` (dispatch into the project ns).
-2. Add cross-ns RBAC: turn `ci-shadow-role` into a `ClusterRole` + a per-project
-   `RoleBinding` so the central Sensor SA can create workflows in each project ns; the
-   workflows still run as that project's `ci-workflow-sa`.
-3. Repoint the GitHub **App-level** webhook (or per-org webhooks) to
-   `https://<prod host>/github` and retire the per-app auto-created webhooks
-   (delete the per-app EventSources, or set `deleteHookOnFinish`).
-
-## Teardown (shadow)
-Delete the repos' extra webhook, remove `charts/ci-system/`, push. ArgoCD prunes the app.
-Existing CI is unaffected throughout.
