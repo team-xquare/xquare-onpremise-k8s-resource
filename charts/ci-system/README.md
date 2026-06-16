@@ -35,21 +35,25 @@ happens until you commit & push.**
 
 ---
 
-## 1) Webhook secret (manual — not committed)
+## 1) Webhook secret (Vault — same pattern as ci-github-secrets)
 
-The chart references secret `github-central-webhook-secret` but does **not** create it
-(keeps the value out of git). Create it once:
+`secretSource: vault` (default) makes the chart create a `VaultAuth` + `VaultStaticSecret`
+that materializes `github-central-webhook-secret` (key `secret`) from Vault — exactly like
+the project chart's `github-app-pem` / `github-token`. Put the HMAC value into Vault once:
 
 ```bash
-export KUBECONFIG=/path/to/kubeconfig
-SECRET=$(openssl rand -hex 32)
-kubectl create namespace ci-system --dry-run=client -o yaml | kubectl apply -f -
-kubectl -n ci-system create secret generic github-central-webhook-secret \
-  --from-literal=secret="$SECRET"
-echo "use this same value as the GitHub webhook secret: $SECRET"
+# value stays in Vault, never in git
+vault kv put xquare-infra-kv/ci-central-webhook \
+  secret=$(openssl rand -hex 32)
+# (reuse the SAME value in the GitHub webhook secret field, step 4)
 ```
 
-(For production, replace with a Vault `VaultStaticSecret` like the rest of the platform.)
+If you already created the secret manually, delete it so VSO can own it:
+`kubectl -n ci-system delete secret github-central-webhook-secret`
+
+Quick-start alternative: set `webhook.secretSource: manual` and create the k8s secret
+yourself (`kubectl -n ci-system create secret generic github-central-webhook-secret
+--from-literal=secret=...`).
 
 ## 2) Gateway host + DNS
 

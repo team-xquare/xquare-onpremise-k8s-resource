@@ -9,10 +9,20 @@ webhook:
   host: argo-events-shadow.dsmhs.kr
   endpoint: /github
   port: 12000
-  # K8s secret (Opaque, key "secret") holding the HMAC shared secret.
-  # NOT created by this chart — create it manually (shadow) or via Vault (prod).
-  # See README.md "1) Webhook secret".
+  # K8s secret (key "secret") holding the HMAC shared secret.
   secretName: github-central-webhook-secret
+  # "vault"  → VaultStaticSecret pulls it from Vault (GitOps, like ci-github-secrets)
+  # "manual" → you create the k8s secret out-of-band (quick shadow start)
+  secretSource: vault
+
+# Vault (vault-secrets-operator) — same mount/role the project chart's CI secrets use.
+# The HMAC value lives in Vault, not git:  vault kv put xquare-infra-kv/ci-central-webhook secret=<hmac>
+vault:
+  mount: xquare-infra-kv
+  path: ci-central-webhook
+  role: xquare-app
+  serviceAccount: ci-system-vault-sa
+  authName: ci-system-infra-vault-auth
 
 # Single central EventBus. Engine "native" mirrors the proven per-project STAN config
 # (guaranteed to come up). Switch to jetstream for prod once a supported version is pinned.
